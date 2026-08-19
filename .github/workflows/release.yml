@@ -17,9 +17,22 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://npm.pkg.github.com
+          scope: '@aplicacoesboilerplate'
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Select release mode
         id: select
         uses: changesets/action/select-mode@v2
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   version:
     needs: select-mode
@@ -62,7 +75,7 @@ jobs:
     if: needs.select-mode.outputs.mode == 'publish'
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
     steps:
       - name: Checkout

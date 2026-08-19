@@ -1,6 +1,6 @@
 {
   "name": "@aplicacoesboilerplate/composables",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Composables Vue reutilizáveis da organização Aplicacoes Boilerplate.",
   "type": "module",
   "files": [
