@@ -27,3 +27,5 @@ coverage
 *.tsbuildinfo
 .env
 .changeset/pre.json
+.turbo/
+entrega.md
