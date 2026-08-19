@@ -1,5 +1,11 @@
 # @aplicacoesboilerplate/ui
 
+## 1.1.1
+
+### Patch Changes
+
+- 70148b2: Teste de pipeline release - publish
+
 ## 1.1.0
 
 ### Minor Changes
