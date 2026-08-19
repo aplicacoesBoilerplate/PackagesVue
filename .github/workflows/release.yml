@@ -1,8 +1,11 @@
 name: Release
 
 on:
+  pull_request:
+    branches: [master]
   push:
-    branches: [main]
+    branches: [master]
+  workflow_dispatch:
 
 jobs:
   select-mode:

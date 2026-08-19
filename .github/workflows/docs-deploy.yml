@@ -1,8 +1,10 @@
 name: Deploy documentation
 
 on:
+  pull_request:
+    branches: [master]
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - '.github/workflows/docs-deploy.yml'
       - 'apps/docs/**'
