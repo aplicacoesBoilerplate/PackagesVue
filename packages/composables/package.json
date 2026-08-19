@@ -1,0 +1,33 @@
+{
+  "name": "@aplicacoesboilerplate/composables",
+  "version": "0.0.0",
+  "description": "Composables Vue reutilizáveis da organização Aplicacoes Boilerplate.",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "scripts": {
+    "build": "vite build",
+    "pack:check": "npm pack --dry-run",
+    "prepack": "npm run build",
+    "test": "vitest run --passWithNoTests",
+    "type-check": "tsc --noEmit -p tsconfig.json"
+  }
+}
