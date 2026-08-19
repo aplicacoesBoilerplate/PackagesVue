@@ -30,4 +30,4 @@ withDefaults(defineProps<IBaseOverlayProps>(), {
 });
 </script>
 
-<style src="BaseOverlay.scss" scoped lang="scss"></style>
+<style src="./BaseOverlay.scss" scoped lang="scss"></style>

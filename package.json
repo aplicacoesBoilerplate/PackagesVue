@@ -10,7 +10,7 @@
   "scripts": {
     "build": "npm run build --workspaces --if-present",
     "changeset": "changeset",
-    "dev:playground": "npm run dev --workspace @aplicacoesboilerplate/playground",
+    "dev:docs": "npm run dev --workspace @aplicacoesboilerplate/docs",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "lint": "eslint --config config/eslint.config.js .",
@@ -43,6 +43,7 @@
     "typescript": "~5.8.0",
     "typescript-eslint": "^8.62.0",
     "vite": "^6.4.3",
+    "vitepress": "^1.6.4",
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^4.1.10",
     "vue": "^3.5.13",

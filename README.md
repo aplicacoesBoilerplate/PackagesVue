@@ -29,23 +29,33 @@ npm run type-check
 npm run test
 npm run pack:check
 npm run changeset
-npm run dev:playground
+npm run dev:docs
 ```
 
 `vue` é uma `peerDependency` dos pacotes que o utilizam, portanto não é empacotado junto às
 bibliotecas.
 
-## Playground
+## Catálogo de componentes
 
-`apps/playground` é uma aplicação Vue mínima, privada e exclusiva para validar os pacotes localmente.
-Ela importa `BaseOverlay` pelo nome público `@aplicacoesboilerplate/ui`.
+`apps/docs` é o catálogo VitePress interno. Ele importa os componentes pelo nome público
+`@aplicacoesboilerplate/ui`, portanto cada preview usa a mesma implementação distribuída aos
+projetos consumidores.
 
 ```bash
-npm run dev:playground
+npm run dev:docs
 ```
 
-Abra a URL exibida pelo Vite e selecione **Exibir overlay**. A tela de carregamento aparece por 1,5
-segundo e fecha automaticamente.
+Abra a URL exibida pelo VitePress e navegue para **Componentes > BaseOverlay**. A página apresenta
+preview interativo, contrato de props, acessibilidade e exemplos de importação e uso.
+
+O catálogo é uma aplicação privada separada e não é incluído no bundle das aplicações consumidoras.
+O build estático é validado pela CI e publicado no GitHub Pages a cada alteração em `main` que afete
+o catálogo ou o pacote `ui`.
+
+Para ativar a publicação, acesse **Settings > Pages** no repositório e configure a origem como
+**GitHub Actions**. A URL do catálogo será exibida ao término da workflow **Deploy documentation**.
+Os desenvolvedores consumidores devem usar essa URL como fonte de consulta, sem instalar pacotes
+adicionais nas aplicações.
 
 ## Versionamento e publicação
 
