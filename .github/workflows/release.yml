@@ -41,10 +41,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check release token
+        env:
+          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          if [ -z "$RELEASE_TOKEN" ]; then
+            echo "Configure o secret RELEASE_TOKEN para permitir a criação da pull request de release."
+            exit 1
+          fi
+
       - name: Create release pull request
         uses: changesets/action/version@v2
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.RELEASE_TOKEN }}
           pr-title: 'chore(release): version packages'
           commit-message: 'chore(release): version packages'
 

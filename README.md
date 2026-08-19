@@ -49,13 +49,12 @@ Abra a URL exibida pelo VitePress e navegue para **Componentes > BaseOverlay**. 
 preview interativo, contrato de props, acessibilidade e exemplos de importação e uso.
 
 O catálogo é uma aplicação privada separada e não é incluído no bundle das aplicações consumidoras.
-O build estático é validado pela CI e publicado no GitHub Pages a cada alteração em `main` que afete
-o catálogo ou o pacote `ui`.
+O build estático é validado pela CI. A workflow **Build documentation** guarda o resultado como
+artefato por 14 dias para inspeção e para um futuro deploy em infraestrutura interna.
 
-Para ativar a publicação, acesse **Settings > Pages** no repositório e configure a origem como
-**GitHub Actions**. A URL do catálogo será exibida ao término da workflow **Deploy documentation**.
-Os desenvolvedores consumidores devem usar essa URL como fonte de consulta, sem instalar pacotes
-adicionais nas aplicações.
+Quando a hospedagem interna for definida, a mesma workflow poderá receber a etapa de deploy que usa
+o diretório `apps/docs/.vitepress/dist`. Os desenvolvedores consumidores não precisam instalar
+pacotes adicionais para consultar o catálogo publicado.
 
 ## Versionamento e publicação
 
@@ -71,15 +70,18 @@ Selecione os pacotes afetados e o incremento semântico adequado. Inclua o arqui
 O changeset incluído para `BaseOverlay` é `minor`: partindo de `@aplicacoesboilerplate/ui@1.0.0`, a
 pull request de release preparará a versão `1.1.0` para publicação.
 
-Após a mesclagem em `main`, a workflow `Release` cria ou atualiza uma pull request de versão. A
+mesclagem dessa pull request atualiza versões e changelogs e publica os artefatos no GitHub Packages.
+Após a mesclagem em `master`, a workflow `Release` cria ou atualiza uma pull request de versão. A
+mesclagem dessa pull request atualiza versões e changelogs e publica os artefatos no GitHub Packages.
 mesclagem dessa pull request atualiza versões e changelogs e publica os artefatos no GitHub Packages.
 
 Os hooks do Husky executam Commitlint no commit, lint-staged antes do commit e `npm run verify`
 antes do push. Eles não incrementam versões: a escolha explícita no Changeset evita versões erradas
 quando uma mudança afeta mais de um pacote.
 
-Para permitir a criação da pull request de versão, habilite **Allow GitHub Actions to create and
-approve pull requests** nas configurações de Actions do repositório.
+Para permitir a criação da pull request de versão, configure o secret `RELEASE_TOKEN` com um token
+fine-grained que tenha acesso ao repositório e permissões **Contents: Read and write** e
+**Pull requests: Read and write**. Um PAT classic com o escopo `repo` também é aceito.
 
 ## Consumo privado
 

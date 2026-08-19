@@ -1,4 +1,4 @@
-name: Deploy documentation
+name: Build documentation
 
 on:
   push:
@@ -13,12 +13,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: github-pages
-  cancel-in-progress: false
 
 jobs:
   build:
@@ -26,10 +20,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-
-      - name: Configure Pages
-        id: pages
-        uses: actions/configure-pages@v5
 
       - name: Setup Node.js
         uses: actions/setup-node@v7
@@ -42,21 +32,10 @@ jobs:
 
       - name: Build documentation
         run: npm run build --workspace @aplicacoesboilerplate/docs
-        env:
-          DOCS_BASE: ${{ steps.pages.outputs.base_path }}/
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v4
+      - name: Upload documentation artifact
+        uses: actions/upload-artifact@v4
         with:
+          name: documentation
           path: apps/docs/.vitepress/dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          retention-days: 14
