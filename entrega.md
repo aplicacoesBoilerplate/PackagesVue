@@ -1,75 +1,50 @@
-# Relatório
+# Entrega
 
-## Tarefa Concluída
+## 1. Realização Técnica
 
-### Realização (Interno)
+### Estabilização de Pipelines
 
-O boilerplate de aplicação foi convertido em um monorepo npm para bibliotecas Vue reutilizáveis.
-Foram preparados os pacotes de componentes, composables e utilitários, todos prontos para gerar
-artefatos de distribuição e tipagens TypeScript. Também foram configurados controles de qualidade,
-versionamento individual dos pacotes e publicação privada automatizada no GitHub Packages. Nesta
-evolução foi incluído o primeiro componente publicável, `BaseOverlay`, e um catálogo de documentação
-interativo para uso interno.
+- **Correção de Permissões:** Liberado o acesso do GitHub Actions para criação e aprovação de Pull Requests no nível da Organização, destravando o fluxo do Changesets.
+- **Resolução de Binários Nativos:** Resolvido o erro de `MODULE_NOT_FOUND` do Rollup em ambiente Linux através da inclusão explícita de `@rollup/rollup-linux-x64-gnu` como `optionalDependency`, eliminando conflitos entre Windows e Linux.
+- **Correção de Preprocessadores:** Instalado `sass-embedded` para garantir a compilação de arquivos `.scss` nos testes de componentes da biblioteca de UI.
 
-### Fontes Modificados
+### Otimização de Performance (Local e Remoto)
 
-- `.changeset/config.json`
-- `.changeset/silver-mirrors-move.md`
+- **Implementação de Orquestração:** Introduzido o **Turborepo** para gerenciar a execução de tarefas no monorepo.
+- **Cache Inteligente:** Configurado `turbo.json` com pipeline de dependências (`build` $\rightarrow$ `test`). Tarefas repetitivas agora são recuperadas do cache (`FULL TURBO`), reduzindo drasticamente o tempo de verificação local.
+- **Aceleração de CI:** Implementado cache de artefatos `.turbo` no GitHub Actions, permitindo que as pipelines de validação ignorem pacotes não alterados.
+- **Otimização de Hooks:** Substituído o `npm run verify` completo no `pre-push` por uma verificação focada em `type-check`, movendo a carga pesada de build e testes para a pipeline de CI, tornando o envio de código instantâneo.
+
+## 2. Garantias de Funcionamento
+
+- **Pipeline de CI:** O comando `npm run verify` agora utiliza o Turbo. Se um pacote não foi alterado, o resultado é instantâneo. Se foi alterado, apenas ele e seus dependentes são processados.
+- **Envios Rápidos:** O fluxo de commit $\rightarrow$ push foi otimizado:
+  - `pre-commit`: Apenas arquivos alterados (via `lint-staged`).
+  - `pre-push`: Apenas verificação de tipos (essencial para evitar quebras óbvias).
+  - `CI`: Validação completa e rigorosa em nuvem.
+
+## 3. Fontes Modificados
+
 - `.github/workflows/ci.yml`
-- `.github/workflows/release.yml`
-- `.github/workflows/docs-deploy.yml`
-- `.gitignore`
-- `.husky/commit-msg`
-- `.husky/pre-commit`
-- `.husky/pre-push`
-- `.npmrc`
-- `README.md`
-- `apps/docs/.vitepress/config.ts`
-- `apps/docs/.vitepress/public/favicon.svg`
-- `apps/docs/.vitepress/theme/components/BaseOverlayPreview.vue`
-- `apps/docs/.vitepress/theme/index.ts`
-- `apps/docs/componentes/base-overlay.md`
-- `apps/docs/index.md`
-- `apps/docs/package.json`
-- `config/commitlint.config.cjs`
-- `config/eslint.config.js`
-- `config/prettier.config.cjs`
-- `package-lock.json`
 - `package.json`
-- `packages/composables/package.json`
-- `packages/composables/src/index.ts`
-- `packages/composables/tsconfig.json`
-- `packages/composables/vite.config.ts`
-- `packages/composables/vitest.config.ts`
-- `packages/ui/package.json`
-- `packages/ui/src/components/BaseOverlay.spec.ts`
-- `packages/ui/src/components/BaseOverlay.vue`
-- `packages/ui/src/index.ts`
-- `packages/ui/tsconfig.json`
-- `packages/ui/vite.config.ts`
-- `packages/ui/vitest.config.ts`
-- `packages/utils/package.json`
-- `packages/utils/src/index.ts`
-- `packages/utils/tsconfig.json`
-- `packages/utils/vite.config.ts`
-- `packages/utils/vitest.config.ts`
-- `tsconfig.base.json`
-- `vite.config.base.ts`
+- `package-lock.json`
+- `turbo.json`
+- `.husky/pre-push`
 
-### p/ Teste
+## 4. Guia de Validação (p/ Teste)
 
-1. Abra o repositório e execute `npm install`.
-2. Execute `npm run verify` e confirme que a validação termina sem erros.
-3. Execute `npm run dev:docs` e abra o endereço exibido no navegador.
-4. Acesse o menu **Componentes** e selecione **BaseOverlay**.
-5. Altere a mensagem no preview e selecione **Exibir overlay**.
-6. Confirme que a tela escurece, apresenta a mensagem informada e volta ao normal após cerca de dois segundos.
-7. Confira as seções de importação, uso, propriedades e acessibilidade na mesma página.
-8. Execute `npm run changeset` e confirme que o pacote `ui` pode receber uma nova versão.
-9. Confirme que o changeset já incluído prepara o pacote `ui` para a versão `1.1.0`.
-10. No GitHub, habilite a origem **GitHub Actions** em **Settings > Pages** e confirme que a workflow
-    **Deploy documentation** informa uma URL de acesso ao catálogo.
+1. **Teste de Performance Local:**
 
-### O que há de novo
 
-O primeiro componente compartilhado já está pronto para publicação e documentação. Use o catálogo para testar o BaseOverlay e acompanhar sua entrega pela versão 1.1.0.
+    - Execute `npm run verify` (Primeira vez: tempo normal).
+    - Execute `npm run verify` novamente (Segunda vez: deve ser quase instantâneo com a mensagem `FULL TURBO`).
+
+2. **Teste de Push:**
+
+
+    - Realize uma alteração simples e execute `git push`. O processo deve ser significativamente mais rápido que a versão anterior.
+
+3. **Validação de Pipeline:**
+
+
+    - Verifique no GitHub Actions se o job `CI / validate` passa com sucesso e se o cache do Turbo está sendo restaurado/salvo.

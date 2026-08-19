@@ -8,19 +8,19 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "verify": "turbo run lint type-check test build",
     "changeset": "changeset",
     "dev:docs": "npm run dev --workspace @aplicacoesboilerplate/docs",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "lint": "eslint --config config/eslint.config.js .",
     "lint:fix": "eslint --config config/eslint.config.js . --fix",
     "pack:check": "npm run pack:check --workspaces --if-present",
     "prepare": "husky",
     "release:publish": "changeset publish",
-    "test": "npm run test --workspaces --if-present",
-    "type-check": "npm run type-check --workspaces --if-present",
-    "verify": "npm run lint && npm run type-check && npm run test && npm run build && npm run pack:check",
     "version-packages": "changeset version"
   },
   "devDependencies": {
@@ -41,6 +41,7 @@
     "lint-staged": "^16.2.7",
     "prettier": "^3.5.3",
     "sass-embedded": "^1.102.0",
+    "turbo": "^2.10.11",
     "typescript": "~5.8.0",
     "typescript-eslint": "^8.62.0",
     "vite": "^6.4.3",
