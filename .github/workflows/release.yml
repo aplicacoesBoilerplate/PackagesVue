@@ -22,6 +22,8 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          registry-url: https://npm.pkg.github.com
+          scope: '@aplicacoesboilerplate'
 
       - name: Install dependencies
         run: npm ci
@@ -29,6 +31,8 @@ jobs:
       - name: Select release mode
         id: select
         uses: changesets/action/select-mode@v2
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   version:
     needs: select-mode
