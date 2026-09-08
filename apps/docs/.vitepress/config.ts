@@ -31,8 +31,8 @@ export default defineConfig({
   vite: {
     resolve: {
       alias: {
-        '@aplicacoesboilerplate/ui': fileURLToPath(
-          new URL('../../../packages/ui/src/index.ts', import.meta.url),
+        '@aplicacoesboilerplate/ui/core': fileURLToPath(
+          new URL('../../../packages/ui/core/src/index.ts', import.meta.url),
         ),
       },
     },

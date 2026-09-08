@@ -3,7 +3,9 @@
 Overlay de tela inteira para comunicar que uma operação está em andamento. Ele não depende de
 Vuetify e utiliza `Teleport` para renderizar acima da aplicação consumidora.
 
+```vue
 <BaseOverlayPreview />
+```
 
 ## Importação
 

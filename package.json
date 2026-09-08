@@ -1,12 +1,14 @@
 {
   "name": "@aplicacoesboilerplate/packages-vue",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
-  "packageManager": "npm@11.8.0",
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/composables",
+    "packages/utils",
+    "packages/ui/*",
+    "tools/docs/manifest"
   ],
   "scripts": {
     "build": "turbo run build",
