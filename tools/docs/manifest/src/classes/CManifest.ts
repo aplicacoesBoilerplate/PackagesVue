@@ -6,6 +6,7 @@ import ts from 'typescript';
 import { parseTypeScriptExport } from '../functions/parseVueComponent/parseTypeScriptExport';
 import { parseVueComponent } from '../functions/parseVueComponent/parseVueComponent';
 import type { IManifest, IManifestExport } from '../models/IManifest.model';
+import { validateSnippets } from '../functions/validators/validateSnippets';
 
 /**
  * @description Gera o manifesto de documentação a partir da API pública de um package.
@@ -14,14 +15,14 @@ export class CManifest {
   /**
    * @description Gera e grava o manifesto de um package.
    */
-  public static generate(pPackageDirectory: string): IManifest {
+  public static async generate(pPackageDirectory: string): Promise<IManifest> {
     const packagePath = resolve(pPackageDirectory, 'package.json');
     const packageJson = JSON.parse(readFileSync(packagePath, 'utf8')) as { name: string };
     const entryPath = resolve(pPackageDirectory, 'src/index.ts');
     const exports = this.parsePublicExports(pPackageDirectory, entryPath);
 
     const manifest: IManifest = {
-      schemaVersion: '1.0',
+      schemaVersion: '1.1',
       packageName: packageJson.name,
       exports,
     };
@@ -44,11 +45,10 @@ export class CManifest {
 
     const outputPath = resolve(pPackageDirectory, 'dist/docs.manifest.json');
     const snippetsOutputPath = resolve(pPackageDirectory, 'dist/snippets.json');
+    await validateSnippets(snippets, ESLINT_CONFIG_PATH);
 
     mkdirSync(dirname(outputPath), { recursive: true });
-
     writeFileSync(outputPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
-
     writeFileSync(snippetsOutputPath, `${JSON.stringify(snippets, null, 2)}\n`, 'utf8');
 
     return manifest;

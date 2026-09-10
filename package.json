@@ -39,6 +39,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-simple-import-sort": "^14.0.0",
     "eslint-plugin-vue": "^10.9.2",
+    "eslint-plugin-jsdoc": "^63.3.3",
     "happy-dom": "^20.11.2",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
