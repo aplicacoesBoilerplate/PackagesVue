@@ -26,10 +26,30 @@ export class CManifest {
       exports,
     };
 
+    const snippetIds = new Set<string>();
+
+    for (const snippet of manifest.exports.flatMap((pExport) => pExport.snippets ?? [])) {
+      if (snippetIds.has(snippet.id)) {
+        throw new Error(`Snippet duplicado: ${snippet.id}`);
+      }
+
+      snippetIds.add(snippet.id);
+    }
+
+    const snippets = Object.fromEntries(
+      manifest.exports
+        .flatMap((pExport) => pExport.snippets ?? [])
+        .map(({ id, ...pSnippet }) => [id, pSnippet]),
+    );
+
     const outputPath = resolve(pPackageDirectory, 'dist/docs.manifest.json');
+    const snippetsOutputPath = resolve(pPackageDirectory, 'dist/snippets.json');
 
     mkdirSync(dirname(outputPath), { recursive: true });
+
     writeFileSync(outputPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+
+    writeFileSync(snippetsOutputPath, `${JSON.stringify(snippets, null, 2)}\n`, 'utf8');
 
     return manifest;
   }

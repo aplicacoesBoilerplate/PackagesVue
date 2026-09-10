@@ -36,7 +36,20 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       'simple-import-sort/exports': 'error',
-      'simple-import-sort/imports': 'error',
+      'simple-import-sort/imports': [
+        'error',
+        {
+          groups: [
+            ['^\\u0000'], // 1° Imports de efeitos colaterais, como import './style.css' e afins.
+            ['^node:'], // 2° Módulos nativos do Node.js.
+            ['^vue$', '^vue/'], // 3° vue e submódulos Vue.
+            ['^(?!@aplicacoesboilerplate/)(@?\\w|#)'], // 4° Dependências externas.
+            ['^@aplicacoesboilerplate/'], // 5° Packages próprios da organização.
+            ['^'], // Imports absolutos e aliases não classificados acima.
+            ['^\\.'], // Imports relativos: ./ e ../.
+          ],
+        },
+      ],
     },
   },
   prettierConfig,

@@ -5,7 +5,9 @@ import { parse } from '@vue/compiler-sfc';
 
 import type { IManifestExport } from '../../models/IManifest.model';
 import { parseCssTokens } from './parseCssTokens';
+import { parseExamples } from './parseExamples';
 import { parseProps } from './parseProps';
+import { parseSnippets } from './parseSnippets';
 
 /**
  * @description Lê um componente Vue e extrai props e tokens CSS configuráveis.
@@ -27,7 +29,7 @@ export function parseVueComponent(
   }
 
   const scriptContent = descriptor.scriptSetup?.content ?? descriptor.script?.content ?? '';
-  const props = parseProps(scriptContent);
+  const props = parseProps(pFilePath, scriptContent);
   const cssTokens = descriptor.styles.flatMap((pStyle) => {
     const styleContent = pStyle.src
       ? readFileSync(resolve(dirname(pFilePath), pStyle.src), 'utf8')
@@ -42,5 +44,7 @@ export function parseVueComponent(
     source: pSourcePath,
     props,
     cssTokens,
+    examples: parseExamples(pFilePath),
+    snippets: parseSnippets(pFilePath),
   };
 }

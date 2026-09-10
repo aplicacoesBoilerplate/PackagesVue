@@ -1,0 +1,21 @@
+{
+  "ab-base-overlay": {
+    "prefix": ["ab-base-overlay"],
+    "description": "Insere um BaseOverlay controlado por estado reativo.",
+    "scope": "vue",
+    "body": [
+      "<BaseOverlay",
+      "  :model-value=\"${1:isLoading}\"",
+      "  message=\"${2:Carregando...}\"",
+      "/>",
+      "",
+      "<script setup lang=\"ts\">",
+      "import { ref } from 'vue';",
+      "",
+      "import { BaseOverlay } from '@aplicacoesboilerplate/ui-core';",
+      "",
+      "const isLoading = ref(false);",
+      "</script>"
+    ]
+  }
+}

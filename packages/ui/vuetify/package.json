@@ -15,7 +15,9 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./style.css": "./dist/style.css"
+    "./style.css": "./dist/style.css",
+    "./manifest": "./dist/docs.manifest.json",
+    "./snippets": "./dist/snippets.json"
   },
   "sideEffects": [
     "**/*.css"
@@ -26,15 +28,16 @@
   },
   "peerDependencies": {
     "vue": "^3.5.0",
-    "vuetify": "^4.0.0"
+    "vuetify": "^4.2.0"
   },
   "devDependencies": {
-    "vuetify": "^4.0.0"
+    "vuetify": "^4.2.0"
   },
   "scripts": {
     "build": "vite build",
-    "pack:check": "npm pack --dry-run",
+    "postbuild": "npm run generate --workspace @aplicacoesboilerplate/docs-manifest -- ../../../packages/ui/vuetify",
     "prepack": "npm run build",
+    "pack:check": "npm pack --dry-run",
     "type-check": "vue-tsc --noEmit -p tsconfig.json"
   }
 }

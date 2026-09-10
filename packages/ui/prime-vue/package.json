@@ -15,7 +15,9 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./style.css": "./dist/style.css"
+    "./style.css": "./dist/style.css",
+    "./manifest": "./dist/docs.manifest.json",
+    "./snippets": "./dist/snippets.json"
   },
   "sideEffects": [
     "**/*.css"
@@ -26,15 +28,16 @@
   },
   "peerDependencies": {
     "vue": "^3.5.0",
-    "primevue": "^4.0.0"
+    "primevue": "^4.5.5"
   },
   "devDependencies": {
-    "primevue": "^4.0.0"
+    "primevue": "^4.5.5"
   },
   "scripts": {
     "build": "vite build",
-    "pack:check": "npm pack --dry-run",
+    "postbuild": "npm run generate --workspace @aplicacoesboilerplate/docs-manifest -- ../../../packages/ui/prime-vue",
     "prepack": "npm run build",
+    "pack:check": "npm pack --dry-run",
     "type-check": "vue-tsc --noEmit -p tsconfig.json"
   }
 }
