@@ -8,7 +8,8 @@
     "packages/composables",
     "packages/utils",
     "packages/ui/*",
-    "tools/docs/manifest"
+    "tools/docs/manifest",
+    "tools/docs/catalog"
   ],
   "scripts": {
     "build": "turbo run build",
@@ -18,6 +19,7 @@
     "verify": "turbo run lint type-check test build",
     "changeset": "changeset",
     "dev:docs": "npm run dev --workspace @aplicacoesboilerplate/docs",
+    "generate:docs-catalog": "npm run generate --workspace @aplicacoesboilerplate/docs-catalog",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "lint:fix": "eslint --config config/eslint.config.js . --fix",
