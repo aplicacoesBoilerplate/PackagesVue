@@ -5,7 +5,7 @@ import BaseOverlay from './BaseOverlay.vue';
 
 describe('BaseOverlay', () => {
   it('exibe a mensagem quando está ativo', () => {
-    const wrapper = mount(BaseOverlay, {
+    const lWrapper = mount(BaseOverlay, {
       global: {
         stubs: {
           Teleport: true,
@@ -17,11 +17,11 @@ describe('BaseOverlay', () => {
       },
     });
 
-    expect(wrapper.get('[role="status"]').text()).toBe('Salvando dados');
+    expect(lWrapper.get('[role="status"]').text()).toBe('Salvando dados');
   });
 
   it('não renderiza o conteúdo quando está inativo', () => {
-    const wrapper = mount(BaseOverlay, {
+    const lWrapper = mount(BaseOverlay, {
       global: {
         stubs: {
           Teleport: true,
@@ -32,6 +32,6 @@ describe('BaseOverlay', () => {
       },
     });
 
-    expect(wrapper.find('[role="status"]').exists()).toBe(false);
+    expect(lWrapper.find('[role="status"]').exists()).toBe(false);
   });
 });

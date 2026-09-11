@@ -5,7 +5,7 @@
     "scope": "vue",
     "body": [
       "<BaseOverlay",
-      "  :model-value=\"${1:isLoading}\"",
+      "  :modelValue=\"${1:lIsLoading}\"",
       "  message=\"${2:Carregando...}\"",
       "/>",
       "",
@@ -14,7 +14,7 @@
       "",
       "import { BaseOverlay } from '@aplicacoesboilerplate/ui-core';",
       "",
-      "const isLoading = ref(false);",
+      "const lIsLoading = ref(false);",
       "</script>"
     ]
   }

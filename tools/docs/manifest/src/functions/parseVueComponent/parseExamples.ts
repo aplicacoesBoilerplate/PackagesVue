@@ -5,18 +5,20 @@ import type { IManifestExample } from '../../models/IManifest.model';
 
 /**
  * @description Lê exemplos de documentação associados a um componente Vue.
+ * @param {string} pComponentFilePath - Caminho absoluto do componente analisado.
+ * @returns {IManifestExample[]} Exemplos vinculados ao componente.
  */
 export function parseExamples(pComponentFilePath: string): IManifestExample[] {
-  const parsedPath = parse(pComponentFilePath);
-  const examplesPath = resolve(dirname(pComponentFilePath), `${parsedPath.name}.examples.vue`);
+  const lParsedPath = parse(pComponentFilePath);
+  const lExamplesPath = resolve(dirname(pComponentFilePath), `${lParsedPath.name}.examples.vue`);
 
-  if (!existsSync(examplesPath)) {
+  if (!existsSync(lExamplesPath)) {
     return [];
   }
 
   return [
     {
-      code: readFileSync(examplesPath, 'utf8'),
+      code: readFileSync(lExamplesPath, 'utf8'),
     },
   ];
 }

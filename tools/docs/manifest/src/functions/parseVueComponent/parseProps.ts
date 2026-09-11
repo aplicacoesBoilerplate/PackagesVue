@@ -1,21 +1,8 @@
-import { existsSync, readFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
-
 import ts from 'typescript';
 
 import type { IManifestProp } from '../../models/IManifest.model';
 
-/**
- * @description Representa uma interface de props junto ao arquivo TypeScript
- * que a declarou.
- *
- * A AST do arquivo é necessária para preservar os textos originais dos tipos
- * ao transformar cada propriedade em uma prop do manifesto.
- */
-interface IResolvedPropsInterface {
-  sourceFile: ts.SourceFile;
-  declaration: ts.InterfaceDeclaration;
-}
+import { getPropertyName, getTypeMembers, resolveTypeDeclaration } from './resolveTypeDeclaration';
 
 /**
  * @description Extrai props públicas declaradas com defineProps em um componente Vue.
@@ -31,7 +18,7 @@ interface IResolvedPropsInterface {
  */
 export function parseProps(pComponentFilePath: string, pScriptContent: string): IManifestProp[] {
   // Cria uma AST em memória; não lê, grava ou modifica arquivos no disco.
-  const componentSourceFile = ts.createSourceFile(
+  const lComponentSourceFile = ts.createSourceFile(
     pComponentFilePath,
     pScriptContent,
     ts.ScriptTarget.Latest,
@@ -39,125 +26,44 @@ export function parseProps(pComponentFilePath: string, pScriptContent: string): 
     ts.ScriptKind.TS,
   );
 
-  // Extrai o nome da interface localizada pelo arquivo do componente.
-  const propsInterfaceName = getPropsInterfaceName(componentSourceFile);
-  if (!propsInterfaceName) {
+  const lPropsType = getPropsType(lComponentSourceFile);
+
+  if (!lPropsType) {
     return [];
   }
 
-  // Extrai as props pelo arquivo do componente e o nome da interface.
-  const propsInterface = getInterfaceDeclaration(componentSourceFile, propsInterfaceName);
+  const lResolvedProps = ts.isTypeLiteralNode(lPropsType)
+    ? { sourceFile: lComponentSourceFile, members: lPropsType.members }
+    : ts.isTypeReferenceNode(lPropsType)
+      ? resolveTypeDeclaration(
+          pComponentFilePath,
+          lComponentSourceFile,
+          lPropsType.typeName.getText(lComponentSourceFile),
+        )
+      : undefined;
 
-  const resolvedPropsInterface = propsInterface
-    ? {
-        sourceFile: componentSourceFile,
-        declaration: propsInterface,
-      }
-    : getImportedInterfaceDeclaration(pComponentFilePath, componentSourceFile, propsInterfaceName);
+  if (!lResolvedProps) {
+    throw new Error(`Não foi possível resolver o tipo de props em ${pComponentFilePath}`);
+  }
 
-  if (!resolvedPropsInterface) {
+  const lMembers =
+    'members' in lResolvedProps
+      ? lResolvedProps.members
+      : getTypeMembers(lResolvedProps.declaration);
+
+  if (!lMembers) {
     throw new Error(
-      `Não foi possível resolver a interface de props "${propsInterfaceName}" em ${pComponentFilePath}`,
+      `O tipo de props deve ser uma interface ou type literal em ${pComponentFilePath}`,
     );
   }
 
-  const defaultValues = getDefaultValues(componentSourceFile);
+  const lDefaultValues = getDefaultValues(lComponentSourceFile);
 
   return getManifestProps(
-    resolvedPropsInterface.sourceFile,
-    resolvedPropsInterface.declaration,
-    defaultValues,
+    'declaration' in lResolvedProps ? lResolvedProps.sourceFile : lComponentSourceFile,
+    lMembers,
+    lDefaultValues,
   );
-}
-
-/**
- * @description Procura uma interface TypeScript declarada no mesmo script
- * que contém a chamada defineProps.
- *
- * @param pSourceFile - AST transitória do script do componente.
- * @param pInterfaceName - Nome da interface referenciada por defineProps.
- * @returns Declaração local da interface, quando encontrada.
- */
-function getInterfaceDeclaration(
-  pSourceFile: ts.SourceFile,
-  pInterfaceName: string,
-): ts.InterfaceDeclaration | undefined {
-  return pSourceFile.statements.find(
-    (pStatement): pStatement is ts.InterfaceDeclaration =>
-      ts.isInterfaceDeclaration(pStatement) && pStatement.name.text === pInterfaceName,
-  );
-}
-
-/**
- * @description Resolve uma interface importada de um módulo TypeScript relativo.
- *
- * Suporta imports nomeados, como:
- * import type { IBaseOverlayProps } from './types/BaseOverlay.types';
- *
- * O caminho importado é resolvido a partir do diretório do componente e recebe
- * a extensão .ts, pois os imports TypeScript normalmente não declaram extensão.
- *
- * @param pComponentFilePath - Caminho absoluto do componente que declarou o import.
- * @param pComponentSourceFile - AST do script do componente.
- * @param pInterfaceName - Nome local da interface usada em defineProps.
- * @returns Arquivo TypeScript importado e a declaração da interface encontrada.
- * @throws Quando o módulo relativo ou a interface referenciada não existir.
- */
-function getImportedInterfaceDeclaration(
-  pComponentFilePath: string,
-  pComponentSourceFile: ts.SourceFile,
-  pInterfaceName: string,
-): IResolvedPropsInterface | undefined {
-  const importDeclaration = pComponentSourceFile.statements.find(
-    (pStatement): pStatement is ts.ImportDeclaration => {
-      if (
-        !ts.isImportDeclaration(pStatement) ||
-        !ts.isStringLiteral(pStatement.moduleSpecifier) ||
-        !pStatement.importClause?.namedBindings ||
-        !ts.isNamedImports(pStatement.importClause.namedBindings)
-      ) {
-        return false;
-      }
-
-      return pStatement.importClause.namedBindings.elements.some(
-        (pElement) => pElement.name.text === pInterfaceName,
-      );
-    },
-  );
-
-  if (!importDeclaration || !ts.isStringLiteral(importDeclaration.moduleSpecifier)) {
-    return undefined;
-  }
-
-  const importedFilePath = resolve(
-    dirname(pComponentFilePath),
-    `${importDeclaration.moduleSpecifier.text}.ts`,
-  );
-
-  if (!existsSync(importedFilePath)) {
-    throw new Error(`Não foi possível localizar o tipo de props: ${importedFilePath}`);
-  }
-
-  const importedSourceFile = ts.createSourceFile(
-    importedFilePath,
-    readFileSync(importedFilePath, 'utf8'),
-    ts.ScriptTarget.Latest,
-    true,
-    ts.ScriptKind.TS,
-  );
-
-  const declaration = getInterfaceDeclaration(importedSourceFile, pInterfaceName);
-
-  if (!declaration) {
-    throw new Error(
-      `Não foi possível localizar a interface "${pInterfaceName}" em ${importedFilePath}`,
-    );
-  }
-
-  return {
-    sourceFile: importedSourceFile,
-    declaration,
-  };
 }
 
 /**
@@ -169,28 +75,38 @@ function getImportedInterfaceDeclaration(
  * foram declarados pelo componente com withDefaults.
  *
  * @param pSourceFile - AST que contém a declaração da interface.
- * @param pInterface - Interface de props resolvida localmente ou por import.
+ * @param pMembers - Members do tipo de props resolvido localmente ou por import.
  * @param pDefaultValues - Valores padrão extraídos de withDefaults.
  * @returns Props compatíveis com o contrato IManifestProp.
  */
 function getManifestProps(
   pSourceFile: ts.SourceFile,
-  pInterface: ts.InterfaceDeclaration,
+  pMembers: ts.NodeArray<ts.TypeElement>,
   pDefaultValues: Map<string, string>,
 ): IManifestProp[] {
-  return pInterface.members.flatMap((pMember) => {
+  return pMembers.flatMap((pMember) => {
     if (!ts.isPropertySignature(pMember) || !pMember.name || !pMember.type) {
       return [];
     }
 
-    const name = pMember.name.getText(pSourceFile);
+    const lName = getPropertyName(pMember.name, pSourceFile);
+
+    if (!lName) {
+      return [];
+    }
+
+    const lDefaultValue = pDefaultValues.get(lName);
 
     return [
       {
-        name,
+        name: lName,
         type: pMember.type.getText(pSourceFile),
         required: !pMember.questionToken,
-        defaultValue: pDefaultValues.get(name),
+        ...(lDefaultValue === undefined
+          ? {}
+          : {
+              defaultValue: lDefaultValue,
+            }),
       },
     ];
   });
@@ -204,20 +120,19 @@ function getManifestProps(
  * não são interpretados como uma lista de props.
  *
  * @param pSourceFile - AST do script do componente.
- * @returns Nome da interface referenciada ou undefined quando defineProps não usa referência.
+ * @returns Nó de tipo declarado ou undefined quando defineProps não usa generics.
  */
-function getPropsInterfaceName(pSourceFile: ts.SourceFile): string | undefined {
-  let interfaceName: string | undefined;
+function getPropsType(pSourceFile: ts.SourceFile): ts.TypeNode | undefined {
+  let lPropsType: ts.TypeNode | undefined;
 
   function visit(pNode: ts.Node): void {
     if (
       ts.isCallExpression(pNode) &&
       ts.isIdentifier(pNode.expression) &&
       pNode.expression.text === 'defineProps' &&
-      pNode.typeArguments?.[0] &&
-      ts.isTypeReferenceNode(pNode.typeArguments[0])
+      pNode.typeArguments?.[0]
     ) {
-      interfaceName = pNode.typeArguments[0].typeName.getText(pSourceFile);
+      lPropsType = pNode.typeArguments[0];
     }
 
     ts.forEachChild(pNode, visit);
@@ -225,7 +140,7 @@ function getPropsInterfaceName(pSourceFile: ts.SourceFile): string | undefined {
 
   visit(pSourceFile);
 
-  return interfaceName;
+  return lPropsType;
 }
 
 /**
@@ -238,7 +153,7 @@ function getPropsInterfaceName(pSourceFile: ts.SourceFile): string | undefined {
  * @returns Mapa que relaciona cada prop ao texto de seu valor padrão.
  */
 function getDefaultValues(pSourceFile: ts.SourceFile): Map<string, string> {
-  const defaultValues = new Map<string, string>();
+  const lDefaultValues = new Map<string, string>();
 
   function visit(pNode: ts.Node): void {
     if (
@@ -248,14 +163,14 @@ function getDefaultValues(pSourceFile: ts.SourceFile): Map<string, string> {
       pNode.arguments[1] &&
       ts.isObjectLiteralExpression(pNode.arguments[1])
     ) {
-      for (const property of pNode.arguments[1].properties) {
-        if (!ts.isPropertyAssignment(property)) {
+      for (const lProperty of pNode.arguments[1].properties) {
+        if (!ts.isPropertyAssignment(lProperty)) {
           continue;
         }
 
-        defaultValues.set(
-          property.name.getText(pSourceFile),
-          property.initializer.getText(pSourceFile),
+        lDefaultValues.set(
+          lProperty.name.getText(pSourceFile),
+          lProperty.initializer.getText(pSourceFile),
         );
       }
     }
@@ -265,5 +180,5 @@ function getDefaultValues(pSourceFile: ts.SourceFile): Map<string, string> {
 
   visit(pSourceFile);
 
-  return defaultValues;
+  return lDefaultValues;
 }

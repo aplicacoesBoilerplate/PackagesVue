@@ -4,46 +4,55 @@ import { dirname, resolve } from 'node:path';
 import { parse } from '@vue/compiler-sfc';
 
 import type { IManifestExport } from '../../models/IManifest.model';
+
 import { parseCssTokens } from './parseCssTokens';
+import { parseEmits } from './parseEmits';
 import { parseExamples } from './parseExamples';
+import { parseExposes } from './parseExposes';
+import { parseModels } from './parseModels';
 import { parseProps } from './parseProps';
+import { parseSlots } from './parseSlots';
 import { parseSnippets } from './parseSnippets';
 
 /**
- * @description Lê um componente Vue e extrai props e tokens CSS configuráveis.
- * @property {string} pFilePath - .
- * @property {string} pExportName - .
- * @property {string} pSourcePath - .
- * @returns {IManifestExport} Usando funções auxiliares, extraímos todas as informações de um componente para montar o manifesto
+ * @description Lê um componente Vue e extrai sua API pública e tokens CSS configuráveis.
+ * @param {string} pFilePath - Caminho absoluto do arquivo Vue analisado.
+ * @param {string} pExportName - Nome público reexportado pelo package.
+ * @param {string} pSourcePath - Caminho do componente relativo ao package.
+ * @returns {IManifestExport} API pública extraída do componente.
  */
 export function parseVueComponent(
   pFilePath: string,
   pExportName: string,
   pSourcePath: string,
 ): IManifestExport {
-  const source = readFileSync(pFilePath, 'utf8');
-  const { descriptor, errors } = parse(source, { filename: pFilePath });
+  const lSource = readFileSync(pFilePath, 'utf8');
+  const { descriptor: lDescriptor, errors: lErrors } = parse(lSource, { filename: pFilePath });
 
-  if (errors.length > 0) {
+  if (lErrors.length > 0) {
     throw new Error(`Não foi possível analisar o componente: ${pFilePath}`);
   }
 
-  const scriptContent = descriptor.scriptSetup?.content ?? descriptor.script?.content ?? '';
-  const props = parseProps(pFilePath, scriptContent);
-  const cssTokens = descriptor.styles.flatMap((pStyle) => {
-    const styleContent = pStyle.src
+  const lScriptContent = lDescriptor.scriptSetup?.content ?? lDescriptor.script?.content ?? '';
+  const lProps = parseProps(pFilePath, lScriptContent);
+  const lCssTokens = lDescriptor.styles.flatMap((pStyle) => {
+    const lStyleContent = pStyle.src
       ? readFileSync(resolve(dirname(pFilePath), pStyle.src), 'utf8')
       : pStyle.content;
 
-    return parseCssTokens(styleContent);
+    return parseCssTokens(lStyleContent);
   });
 
   return {
     name: pExportName,
     kind: 'component',
     source: pSourcePath,
-    props,
-    cssTokens,
+    props: lProps,
+    emits: parseEmits(pFilePath, lScriptContent),
+    models: parseModels(pFilePath, lScriptContent),
+    slots: parseSlots(pFilePath, lScriptContent),
+    exposes: parseExposes(pFilePath, lScriptContent),
+    cssTokens: lCssTokens,
     examples: parseExamples(pFilePath),
     snippets: parseSnippets(pFilePath),
   };

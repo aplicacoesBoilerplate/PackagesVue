@@ -2,10 +2,10 @@
   <Teleport to="body">
     <div
       v-if="modelValue"
+      :aria-label="message"
       class="base-overlay"
       role="status"
       aria-live="polite"
-      :aria-label="message"
     >
       <div class="base-overlay__content">
         <span class="base-overlay__spinner" aria-hidden="true" />

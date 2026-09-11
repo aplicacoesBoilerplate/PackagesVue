@@ -30,7 +30,8 @@ export interface IManifest {
  * @property {IManifestCssToken[]} [cssTokens] - Tokens CSS configuráveis.
  * @property {IManifestExample[]} [examples] - Exemplos renderizados na documentação.
  * @property {IManifestSnippet[]} [snippets] - Snippets consumíveis pela CLI.
- */export interface IManifestExport {
+ */
+export interface IManifestExport {
   name: string;
   kind: 'class' | 'component' | 'composable' | 'function' | 'interface' | 'type';
   source: string;

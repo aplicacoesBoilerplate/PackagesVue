@@ -7,24 +7,26 @@ type TSnippetDefinition = Omit<IManifestSnippet, 'id'>;
 
 /**
  * @description Lê snippets VS Code associados a um componente Vue.
+ * @param {string} pComponentFilePath - Caminho absoluto do componente analisado.
+ * @returns {IManifestSnippet[]} Snippets válidos vinculados ao componente.
  */
 export function parseSnippets(pComponentFilePath: string): IManifestSnippet[] {
-  const parsedPath = parse(pComponentFilePath);
-  const snippetsPath = resolve(dirname(pComponentFilePath), `${parsedPath.name}.snippets.json`);
+  const lParsedPath = parse(pComponentFilePath);
+  const lSnippetsPath = resolve(dirname(pComponentFilePath), `${lParsedPath.name}.snippets.json`);
 
-  if (!existsSync(snippetsPath)) {
+  if (!existsSync(lSnippetsPath)) {
     return [];
   }
 
-  const content: unknown = JSON.parse(readFileSync(snippetsPath, 'utf8'));
+  const lContent: unknown = JSON.parse(readFileSync(lSnippetsPath, 'utf8'));
 
-  if (!isRecord(content)) {
-    throw new Error(`O arquivo de snippets deve conter um objeto: ${snippetsPath}`);
+  if (!isRecord(lContent)) {
+    throw new Error(`O arquivo de snippets deve conter um objeto: ${lSnippetsPath}`);
   }
 
-  return Object.entries(content).map(([pId, pSnippet]) => {
+  return Object.entries(lContent).map(([pId, pSnippet]) => {
     if (!isSnippetDefinition(pSnippet)) {
-      throw new Error(`Snippet inválido "${pId}" em ${snippetsPath}`);
+      throw new Error(`Snippet inválido "${pId}" em ${lSnippetsPath}`);
     }
 
     return {

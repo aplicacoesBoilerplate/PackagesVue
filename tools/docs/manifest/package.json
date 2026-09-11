@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "generate": "tsx src/index.ts"
+    "generate": "tsx src/index.ts",
+    "test": "tsx --test test/parseVueComponent.test.ts"
   },
   "devDependencies": {
     "@types/node": "^22.15.18",

@@ -41,8 +41,8 @@ export default tseslint.config(
       },
     },
   },
+  prettierConfig,
   {
-    prettierConfig,
     plugins: {
       // Regras para JSDoc
       jsdoc,
@@ -70,7 +70,7 @@ export default tseslint.config(
       // Reporta variáveis declaradas e não utilizadas, exceto parâmetros
       // intencionalmente ignorados quando iniciados por "_".
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-      
+
       // Regras de convensão de nomes de seletores
       '@typescript-eslint/naming-convention': [
         'error',
@@ -155,7 +155,7 @@ export default tseslint.config(
             // 1° Imports de efeitos colaterais, como import './style.css' e afins.
             ['^\\u0000'],
 
-            // 2° Módulos nativos do Node.js. 
+            // 2° Módulos nativos do Node.js.
             ['^node:'],
 
             // 3° vue e submódulos Vue.
@@ -167,7 +167,7 @@ export default tseslint.config(
               '^dayjs',
               '^html2canvas',
               '^jspdf',
-              '^xlsx$'
+              '^xlsx$',
             ],
 
             // 4° Dependências externas.
@@ -194,11 +194,11 @@ export default tseslint.config(
       ],
       'no-undef': 'off',
       // #endregion
-    
+
       // #region Regras vue
       // Apenas 1 atributo/prop por linha.
       'vue/max-attributes-per-line': [
-        'warn',
+        'error',
         {
           singleline: { max: 1 },
           multiline: { max: 1 },
@@ -208,7 +208,7 @@ export default tseslint.config(
       // Define a posição do primeiro atributo: ao lado da tag em elementos de
       // uma linha e abaixo da tag de abertura quando o elemento é multilinha.
       'vue/first-attribute-linebreak': [
-        'warn',
+        'error',
         {
           singleline: 'beside',
           multiline: 'below',
@@ -217,7 +217,7 @@ export default tseslint.config(
 
       // Fechar tag com '/>' em linha própria quando houver múltiplos atributos.
       'vue/html-closing-bracket-newline': [
-        'warn',
+        'error',
         {
           singleline: 'never',
           multiline: 'always',
@@ -227,7 +227,7 @@ export default tseslint.config(
       // Padroniza a indentação do template com dois espaços, incluindo atributos,
       // conteúdo interno e o fechamento de tags multilinha.
       'vue/html-indent': [
-        'warn',
+        'error',
         2,
         {
           attribute: 1,
@@ -262,7 +262,7 @@ export default tseslint.config(
       // Silencia os erros de hyphenation que impedem o camelCase
       'vue/attribute-hyphenation': ['error', 'never'],
       'vue/v-on-event-hyphenation': ['error', 'never'],
-      
+
       // Define a ordem das tags de um componente vue.
       'vue/block-order': [
         'error',
@@ -271,6 +271,13 @@ export default tseslint.config(
         },
       ],
       // #endregion
-    }
+    },
+  },
+  {
+    // A CLI de documentação é uma aplicação Node e reporta seu resultado ao terminal.
+    files: ['tools/docs/**/*.ts'],
+    rules: {
+      'no-console': 'off',
+    },
   },
 );

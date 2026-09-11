@@ -34,7 +34,7 @@
     "postbuild": "npm run generate --workspace @aplicacoesboilerplate/docs-manifest -- ../../../packages/ui/core",
     "prepack": "npm run build",
     "pack:check": "npm pack --dry-run",
-    "test": "vitest run --passWithNoTests",
+    "test": "vitest run --environment happy-dom --passWithNoTests",
     "type-check": "vue-tsc --noEmit -p tsconfig.json"
   }
 }
