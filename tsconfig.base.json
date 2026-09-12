@@ -1,5 +1,19 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      // Packages
+      "@core": ["./packages/ui/core/src/index.ts"],
+      "@core/*": ["./packages/ui/core/src/*"],
+      "@primeVue": ["./packages/ui/prime-vue/src/index.ts"],
+      "@primeVue/*": ["./packages/ui/prime-vue/src/*"],
+      "@vuetify": ["./packages/ui/vuetify/src/index.ts"],
+      "@vuetify/*": ["./packages/ui/vuetify/src/*"],
+
+      // Ferramentas
+      "@tools/*": ["./tools/*"],
+      "@manifest/*": ["./tools/docs/manifest/src/*"]
+    },
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "Bundler",

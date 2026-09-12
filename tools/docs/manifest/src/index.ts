@@ -6,7 +6,9 @@ import { CManifest } from './classes/CManifest';
  * @description Executa a geração de manifesto para um package informado.
  */
 async function main(): Promise<void> {
-  const lPackageDirectory = process.argv[2];
+  const lArguments = process.argv.slice(2);
+  const lGenerateEntry = lArguments.includes('--entry');
+  const lPackageDirectory = lArguments.find((pArgument) => pArgument !== '--entry');
 
   if (!lPackageDirectory) {
     throw new Error(
@@ -14,7 +16,18 @@ async function main(): Promise<void> {
     );
   }
 
-  const lManifest = await CManifest.generate(resolve(lPackageDirectory));
+  const lResolvedPackageDirectory = resolve(lPackageDirectory);
+
+  if (lGenerateEntry) {
+    const lGenerated = await CManifest.generateEntry(lResolvedPackageDirectory);
+
+    console.log(
+      lGenerated ? 'Entry point público gerado.' : 'Package sem registro; entry point preservado.',
+    );
+    return;
+  }
+
+  const lManifest = await CManifest.generate(lResolvedPackageDirectory);
 
   console.log(
     `Manifesto gerado para %s com %s export(s).`,

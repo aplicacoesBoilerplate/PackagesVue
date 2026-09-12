@@ -1,7 +1,7 @@
 {
-  "core-base-overlay": {
-    "prefix": ["core-base-overlay"],
-    "description": "Insere um BaseOverlay controlado por estado reativo.",
+  "vuetify-base-overlay": {
+    "prefix": ["vuetify-base-overlay"],
+    "description": "Insere um BaseOverlay do Vuetify controlado por estado reativo.",
     "scope": "vue",
     "body": [
       "<BaseOverlay",
@@ -12,7 +12,7 @@
       "<script setup lang=\"ts\">",
       "import { ref } from 'vue';",
       "",
-      "import { BaseOverlay } from '@aplicacoesboilerplate/ui-core';",
+      "import { BaseOverlay } from '@aplicacoesboilerplate/ui-vuetify';",
       "",
       "const lIsLoading = ref(false);",
       "</script>"
