@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url';
+
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
@@ -14,11 +16,56 @@ export function createLibraryConfig(pOptions: ILibraryConfigOptions) {
       ...(pOptions.plugins ?? []),
       dts({
         entryRoot: 'src',
-        exclude: ['src/**/*.spec.ts', 'src/**/*.test.ts', 'src/docs/**/*.ts'],
+        exclude: [
+          'src/**/*.spec.ts',
+          'src/**/*.test.ts',
+          'src/docs/**/*.ts',
+          'src/**/CRegister*.ts',
+        ],
         insertTypesEntry: true,
         tsconfigPath: './tsconfig.json',
       }),
     ],
+    resolve: {
+      alias: [
+        // packages
+        {
+          find: /^@core$/,
+          replacement: fileURLToPath(new URL('./packages/ui/core/src/index.ts', import.meta.url)),
+        },
+        {
+          find: '@core',
+          replacement: fileURLToPath(new URL('./packages/ui/core/src', import.meta.url)),
+        },
+        {
+          find: /^@primeVue$/,
+          replacement: fileURLToPath(
+            new URL('./packages/ui/prime-vue/src/index.ts', import.meta.url),
+          ),
+        },
+        {
+          find: '@primeVue',
+          replacement: fileURLToPath(new URL('./packages/ui/prime-vue/src', import.meta.url)),
+        },
+        {
+          find: /^@vuetify$/,
+          replacement: fileURLToPath(
+            new URL('./packages/ui/vuetify/src/index.ts', import.meta.url),
+          ),
+        },
+        {
+          find: '@vuetify',
+          replacement: fileURLToPath(new URL('./packages/ui/vuetify/src', import.meta.url)),
+        },
+
+        // Ferramentas
+        { find: '@tools', replacement: fileURLToPath(new URL('./tools', import.meta.url)) },
+        {
+          find: '@manifest',
+          replacement: fileURLToPath(new URL('./tools/docs/manifest/src', import.meta.url)),
+        },
+      ],
+    },
     build: {
       emptyOutDir: true,
       lib: {

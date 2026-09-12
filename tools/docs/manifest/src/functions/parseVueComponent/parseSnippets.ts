@@ -18,15 +18,29 @@ export function parseSnippets(pComponentFilePath: string): IManifestSnippet[] {
     return [];
   }
 
-  const lContent: unknown = JSON.parse(readFileSync(lSnippetsPath, 'utf8'));
+  return parseSnippetFile(lSnippetsPath);
+}
+
+/**
+ * @description Lê um arquivo JSON de snippets declarado pelo registro de uma API pública.
+ * @param {string} pSnippetsPath - Caminho absoluto do arquivo de snippets.
+ * @returns Snippets válidos definidos no arquivo informado.
+ * @throws Quando o arquivo não existe ou possui uma estrutura inválida.
+ */
+export function parseSnippetFile(pSnippetsPath: string): IManifestSnippet[] {
+  if (!existsSync(pSnippetsPath)) {
+    throw new Error(`Arquivo de snippets não encontrado: ${pSnippetsPath}`);
+  }
+
+  const lContent: unknown = JSON.parse(readFileSync(pSnippetsPath, 'utf8'));
 
   if (!isRecord(lContent)) {
-    throw new Error(`O arquivo de snippets deve conter um objeto: ${lSnippetsPath}`);
+    throw new Error(`O arquivo de snippets deve conter um objeto: ${pSnippetsPath}`);
   }
 
   return Object.entries(lContent).map(([pId, pSnippet]) => {
     if (!isSnippetDefinition(pSnippet)) {
-      throw new Error(`Snippet inválido "${pId}" em ${lSnippetsPath}`);
+      throw new Error(`Snippet inválido "${pId}" em ${pSnippetsPath}`);
     }
 
     return {

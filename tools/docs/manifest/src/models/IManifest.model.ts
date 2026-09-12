@@ -46,7 +46,7 @@ export interface IManifestExport {
   cssTokens?: IManifestCssToken[];
   examples?: IManifestExample[];
   snippets?: IManifestSnippet[];
-  navigation?: import('./IRegistry.model').IManifestNavigation;
+  navigation?: IManifestNavigation;
   description?: string;
   instructions?: string[];
   previews?: IManifestPreview[];
@@ -185,4 +185,15 @@ export interface IManifestSnippet {
   description: string;
   scope: string;
   body: string[];
+}
+
+/**
+ * @description Metadados de navegação editoriais de uma API pública.
+ *
+ * @property {string} group - Grupo que receberá a API na documentação.
+ * @property {number} order - Ordem da API dentro do grupo.
+ */
+export interface IManifestNavigation {
+  group: string;
+  order: number;
 }

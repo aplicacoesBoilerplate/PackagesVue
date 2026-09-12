@@ -1,4 +1,4 @@
-import { CRegister } from './CRegister';
+import { CRegister } from '@tools/docs/manifest/src/classes/CRegister';
 
 /**
  * @description Declara a interface pública associada ao BaseOverlay.

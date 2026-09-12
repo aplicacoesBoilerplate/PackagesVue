@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { cpSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { resolve } from 'node:path';
 import test from 'node:test';
 
@@ -19,7 +19,32 @@ const FIXTURE_TYPE_FILE_PATH = resolve(
   import.meta.dirname,
   '../../../../packages/ui/core/src/components/bases/overlay/types/BaseOverlay.types.ts',
 );
-const CORE_PACKAGE_DIRECTORY = resolve(import.meta.dirname, '../../../../packages/ui/core');
+const REGISTERED_PACKAGE_CASES = [
+  {
+    artifactId: 'base-overlay',
+    directory: resolve(import.meta.dirname, '../../../../packages/ui/core'),
+    exportCount: 2,
+    previewId: 'base-overlay-default',
+    snippetId: 'core-base-overlay',
+    temporaryDirectoryName: 'ui-core',
+  },
+  {
+    artifactId: 'prime-vue-base-overlay',
+    directory: resolve(import.meta.dirname, '../../../../packages/ui/prime-vue'),
+    exportCount: 1,
+    previewId: 'prime-vue-base-overlay-default',
+    snippetId: 'prime-vue-base-overlay',
+    temporaryDirectoryName: 'ui-prime-vue',
+  },
+  {
+    artifactId: 'vuetify-base-overlay',
+    directory: resolve(import.meta.dirname, '../../../../packages/ui/vuetify'),
+    exportCount: 1,
+    previewId: 'vuetify-base-overlay-default',
+    snippetId: 'vuetify-base-overlay',
+    temporaryDirectoryName: 'ui-vuetify',
+  },
+];
 const MACROS_SOURCE = `
 const lEmit = defineEmits<{
   saved: [pId: string];
@@ -102,23 +127,45 @@ test('extrai emits, models, slots e exposes tipados', () => {
   ]);
 });
 
-test('gera API registrada, snippets e loaders de preview sem executar o exemplo', async () => {
-  await CManifest.generateEntry(CORE_PACKAGE_DIRECTORY);
-  const lManifest = await CManifest.generate(CORE_PACKAGE_DIRECTORY);
-  const lBaseOverlay = lManifest.exports.find((pExport) => pExport.id === 'base-overlay');
-  const lEntryPoint = readFileSync(resolve(CORE_PACKAGE_DIRECTORY, 'src/index.ts'), 'utf8');
-  const lPreviewLoaders = readFileSync(
-    resolve(CORE_PACKAGE_DIRECTORY, 'src/docs/preview-loaders.generated.ts'),
-    'utf8',
-  );
-  const lSnippets = JSON.parse(
-    readFileSync(resolve(CORE_PACKAGE_DIRECTORY, 'dist/snippets.json'), 'utf8'),
-  ) as Record<string, unknown>;
+test('gera APIs registradas, snippets e loaders de preview sem executar os exemplos', async () => {
+  const lTemporaryDirectory = mkdtempSync(resolve(import.meta.dirname, '.tmp-docs-manifest-'));
 
-  assert.deepEqual(lBaseOverlay?.navigation, { group: 'Componentes', order: 10 });
-  assert.equal(lBaseOverlay?.previews?.[0]?.id, 'base-overlay-default');
-  assert.equal(lBaseOverlay?.snippets?.[0]?.id, 'ab-base-overlay');
-  assert.match(lEntryPoint, /export \{ default as BaseOverlay \}/);
-  assert.match(lPreviewLoaders, /base-overlay-default/);
-  assert.ok('ab-base-overlay' in lSnippets);
+  try {
+    for (const lPackageCase of REGISTERED_PACKAGE_CASES) {
+      const lTemporaryPackageDirectory = resolve(
+        lTemporaryDirectory,
+        lPackageCase.temporaryDirectoryName,
+      );
+
+      cpSync(lPackageCase.directory, lTemporaryPackageDirectory, { recursive: true });
+
+      await CManifest.generateEntry(lTemporaryPackageDirectory);
+      const lManifest = await CManifest.generate(lTemporaryPackageDirectory);
+      const lBaseOverlay = lManifest.exports.find(
+        (pExport) => pExport.id === lPackageCase.artifactId,
+      );
+      const lEntryPoint = readFileSync(resolve(lTemporaryPackageDirectory, 'src/index.ts'), 'utf8');
+      const lPreviewLoaders = readFileSync(
+        resolve(lTemporaryPackageDirectory, 'src/preview-loaders.generated.ts'),
+        'utf8',
+      );
+      const lSnippets = JSON.parse(
+        readFileSync(resolve(lTemporaryPackageDirectory, 'dist/snippets.json'), 'utf8'),
+      ) as Record<string, unknown>;
+
+      assert.equal(lManifest.exports.length, lPackageCase.exportCount);
+      assert.deepEqual(lBaseOverlay?.navigation, { group: 'Componentes', order: 10 });
+      assert.equal(lBaseOverlay?.previews?.[0]?.id, lPackageCase.previewId);
+      assert.equal(lBaseOverlay?.snippets?.[0]?.id, lPackageCase.snippetId);
+      assert.match(
+        lBaseOverlay?.examples?.[0]?.code ?? '',
+        new RegExp(`from '${lManifest.packageName}'`),
+      );
+      assert.match(lEntryPoint, /export \{ default as BaseOverlay \}/);
+      assert.match(lPreviewLoaders, new RegExp(lPackageCase.previewId));
+      assert.ok(lPackageCase.snippetId in lSnippets);
+    }
+  } finally {
+    rmSync(lTemporaryDirectory, { force: true, recursive: true });
+  }
 });

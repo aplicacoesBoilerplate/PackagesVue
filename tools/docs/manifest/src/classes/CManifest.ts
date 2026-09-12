@@ -7,6 +7,7 @@ import ts from 'typescript';
 import type { IManifest, IManifestExport, IManifestPreview } from '../models/IManifest.model';
 import type { IRegisteredArtifact, IRegisteredPreview } from '../models/IRegistry.model';
 
+import { parseSnippetFile } from '../functions/parseVueComponent/parseSnippets';
 import { parseTypeScriptExport } from '../functions/parseVueComponent/parseTypeScriptExport';
 import { parseVueComponent } from '../functions/parseVueComponent/parseVueComponent';
 import { validateSnippets } from '../functions/validators/validateSnippets';
@@ -61,10 +62,6 @@ export class CManifest {
     mkdirSync(dirname(lOutputPath), { recursive: true });
     writeFileSync(lOutputPath, `${JSON.stringify(lManifest, null, 2)}\n`, 'utf8');
     writeFileSync(lSnippetsOutputPath, `${JSON.stringify(lSnippets, null, 2)}\n`, 'utf8');
-
-    if (lArtifacts) {
-      this.writePublicEntry(lEntryPath, lArtifacts);
-    }
 
     return lManifest;
   }
@@ -198,6 +195,7 @@ export class CManifest {
       }
 
       const lPreviews = this.readPreviews(pPackageDirectory, pArtifact.previews ?? []);
+      const lSnippets = this.readSnippets(pPackageDirectory, pArtifact);
 
       return [
         {
@@ -208,7 +206,7 @@ export class CManifest {
           instructions: pArtifact.instructions,
           examples: lPreviews.map(({ code: pCode }) => ({ code: pCode })),
           previews: lPreviews,
-          snippets: pArtifact.snippets ?? [],
+          snippets: lSnippets,
         },
       ];
     });
@@ -240,6 +238,23 @@ export class CManifest {
   }
 
   /**
+   * @description Lê os snippets declarados pelo registro sem acoplar o JSON à classe.
+   * @param {string} pPackageDirectory - Diretório do package analisado.
+   * @param {IRegisteredArtifact} pArtifact - API pública que pode declarar snippets.
+   * @returns Snippets serializáveis no manifesto.
+   */
+  private static readSnippets(
+    pPackageDirectory: string,
+    pArtifact: IRegisteredArtifact,
+  ): IManifestExport['snippets'] {
+    if (!pArtifact.snippetsSource) {
+      return [];
+    }
+
+    return parseSnippetFile(resolve(pPackageDirectory, 'src', pArtifact.snippetsSource));
+  }
+
+  /**
    * @description Grava exports estáticos para manter a API consumível por ESM e TypeScript.
    * @param {string} pEntryPath - Caminho do entry point público.
    * @param {IRegisteredArtifact[]} pArtifacts - APIs públicas declaradas.
@@ -259,7 +274,7 @@ export class CManifest {
       })
       .join('\n');
 
-    writeFileSync(pEntryPath, `${lContent}\n`, 'utf8');
+    this.writeFileIfChanged(pEntryPath, `${lContent}\n`);
   }
 
   /**
@@ -271,9 +286,22 @@ export class CManifest {
     pPackageDirectory: string,
     pArtifacts: IRegisteredArtifact[],
   ): void {
-    const lOutputPath = resolve(pPackageDirectory, 'src/docs/preview-loaders.generated.ts');
+    const lOutputPath = resolve(pPackageDirectory, 'src/preview-loaders.generated.ts');
 
-    writeFileSync(lOutputPath, this.renderPreviewLoaders(pArtifacts), 'utf8');
+    this.writeFileIfChanged(lOutputPath, this.renderPreviewLoaders(pArtifacts));
+  }
+
+  /**
+   * @description Atualiza um arquivo gerado somente quando seu conteúdo mudou.
+   * @param {string} pFilePath - Caminho absoluto do arquivo gerado.
+   * @param {string} pContent - Conteúdo completo que deverá ser persistido.
+   */
+  private static writeFileIfChanged(pFilePath: string, pContent: string): void {
+    if (existsSync(pFilePath) && readFileSync(pFilePath, 'utf8') === pContent) {
+      return;
+    }
+
+    writeFileSync(pFilePath, pContent, 'utf8');
   }
 
   /**
@@ -285,10 +313,25 @@ export class CManifest {
     const lPreviews = pArtifacts.flatMap((pArtifact) => pArtifact.previews ?? []);
     const lEntries = lPreviews.map(
       (pPreview) =>
-        `PREVIEW_LOADERS[${JSON.stringify(pPreview.id)}] = () => import(${JSON.stringify(`../${pPreview.source.replace(/^\.\//, '')}`)});`,
+        `PREVIEW_LOADERS[${this.renderStringLiteral(pPreview.id)}] = () =>\n  import(${this.renderStringLiteral(`./${pPreview.source.replace(/^\.\//, '')}`)});`,
     );
 
     return `export const PREVIEW_LOADERS: Record<string, () => Promise<unknown>> = {};\n\n${lEntries.join('\n')}\n`;
+  }
+
+  /**
+   * @description Converte um valor em literal TypeScript com o padrão de aspas do repositório.
+   * @param {string} pValue - Texto que será incorporado ao código gerado.
+   * @returns Literal TypeScript com escapes seguros.
+   */
+  private static renderStringLiteral(pValue: string): string {
+    const lEscapedValue = pValue
+      .replaceAll('\\', '\\\\')
+      .replaceAll("'", "\\'")
+      .replaceAll('\n', '\\n')
+      .replaceAll('\r', '\\r');
+
+    return `'${lEscapedValue}'`;
   }
 
   /**
@@ -329,6 +372,13 @@ export class CManifest {
 
       if (!lArtifact.source.startsWith('./') || lArtifact.source.includes('..')) {
         throw new Error(`Caminho de registro inválido: ${lArtifact.source}`);
+      }
+
+      if (
+        lArtifact.snippetsSource &&
+        (!lArtifact.snippetsSource.startsWith('./') || lArtifact.snippetsSource.includes('..'))
+      ) {
+        throw new Error(`Caminho de snippets inválido: ${lArtifact.snippetsSource}`);
       }
 
       lArtifactIds.add(lArtifact.id);

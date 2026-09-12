@@ -8,9 +8,10 @@ export default createLibraryConfig({
   entry: {
     index: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
     'preview-loaders': fileURLToPath(
-      new URL('./src/docs/preview-loaders.generated.ts', import.meta.url),
+      new URL('./src/preview-loaders.generated.ts', import.meta.url),
     ),
   },
-  external: ['vue'],
+  external: (pDependency) =>
+    pDependency === 'vue' || pDependency === '@aplicacoesboilerplate/ui-core',
   plugins: [vue()],
 });

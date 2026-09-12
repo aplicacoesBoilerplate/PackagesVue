@@ -1,8 +1,8 @@
-import type { IManifestExport } from '../../../../../tools/docs/manifest/src/models/IManifest.model';
-import type { IRegisteredArtifact } from '../../../../../tools/docs/manifest/src/models/IRegistry.model';
+import type { IManifestExport } from '../models/IManifest.model';
+import type { IRegisteredArtifact } from '../models/IRegistry.model';
 
 /**
- * @description Base declarativa para registrar uma API pública do package.
+ * @description Base declarativa compartilhada para registrar uma API pública de package.
  *
  * A classe não importa nem executa o artefato registrado. Ela apenas fornece ao
  * gerador referências e metadados que serão validados contra a extração estática.

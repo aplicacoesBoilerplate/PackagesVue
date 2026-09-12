@@ -1,4 +1,4 @@
-import { CRegister } from './CRegister';
+import { CRegister } from '@tools/docs/manifest/src/classes/CRegister';
 
 /**
  * @description Declara os metadados públicos do componente BaseOverlay.
@@ -26,27 +26,6 @@ export class CRegisterBaseOverlay extends CRegister<'component'> {
         source: './components/bases/overlay/BaseOverlay.examples.vue',
       },
     ],
-    snippets: [
-      {
-        id: 'ab-base-overlay',
-        prefix: ['ab-base-overlay'],
-        description: 'Insere um BaseOverlay controlado por estado reativo.',
-        scope: 'vue',
-        body: [
-          '<BaseOverlay',
-          '  :modelValue="${1:lIsLoading}"',
-          '  message="${2:Carregando...}"',
-          '/>',
-          '',
-          '<script setup lang="ts">',
-          "import { ref } from 'vue';",
-          '',
-          "import { BaseOverlay } from '@aplicacoesboilerplate/ui-core';",
-          '',
-          'const lIsLoading = ref(false);',
-          '</script>',
-        ],
-      },
-    ],
+    snippetsSource: './components/bases/overlay/BaseOverlay.snippets.json',
   };
 }

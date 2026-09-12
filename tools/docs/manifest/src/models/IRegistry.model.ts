@@ -1,15 +1,4 @@
-import type { IManifestExport, IManifestSnippet } from './IManifest.model';
-
-/**
- * @description Metadados de navegação editoriais de uma API pública.
- *
- * @property {string} group - Grupo que receberá a API na documentação.
- * @property {number} order - Ordem da API dentro do grupo.
- */
-export interface IManifestNavigation {
-  group: string;
-  order: number;
-}
+import type { IManifestExport, IManifestNavigation } from './IManifest.model';
 
 /**
  * @description Declara um cenário Vue carregável pelo playground da documentação.
@@ -40,7 +29,7 @@ export interface IRegisteredPreview {
  * @property {string} description - Descrição curta da responsabilidade pública.
  * @property {string[]} instructions - Instruções de uso exibidas no playground.
  * @property {IRegisteredPreview[]} [previews] - Cenários executáveis associados.
- * @property {IManifestSnippet[]} [snippets] - Snippets destinados à CLI e às IDEs.
+ * @property {string} [snippetsSource] - Caminho relativo a src do JSON de snippets.
  */
 export interface IRegisteredArtifact<
   TKind extends IManifestExport['kind'] = IManifestExport['kind'],
@@ -55,5 +44,5 @@ export interface IRegisteredArtifact<
   description: string;
   instructions: string[];
   previews?: IRegisteredPreview[];
-  snippets?: IManifestSnippet[];
+  snippetsSource?: string;
 }

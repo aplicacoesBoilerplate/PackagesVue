@@ -1,10 +1,9 @@
 import type { IRegisteredArtifact } from '@tools/docs/manifest/src/models/IRegistry.model';
 
 import { CRegisterBaseOverlay } from '../components/bases/overlay/CRegisterBaseOverlay';
-import { CRegisterBaseOverlayProps } from '../components/bases/overlay/CRegisterBaseOverlayProps';
 
 /**
- * @description Agrega os registros públicos do package ui-core.
+ * @description Agrega os registros públicos do package ui-vuetify.
  */
 export default class CPackageRegister {
   /**
@@ -12,6 +11,6 @@ export default class CPackageRegister {
    * @returns APIs declaradas para publicação pelo package.
    */
   public static getArtifacts(): IRegisteredArtifact[] {
-    return [new CRegisterBaseOverlay().artifact, new CRegisterBaseOverlayProps().artifact];
+    return [new CRegisterBaseOverlay().artifact];
   }
 }

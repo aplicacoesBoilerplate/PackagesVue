@@ -8,7 +8,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-import { BaseOverlay } from '@aplicacoesboilerplate/ui-core';
+import { BaseOverlay } from '@aplicacoesboilerplate/ui-vuetify';
 
 const rIsLoading = ref(false);
 </script>
