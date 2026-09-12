@@ -19,6 +19,7 @@ export function createLibraryConfig(pOptions: ILibraryConfigOptions) {
         exclude: [
           'src/**/*.spec.ts',
           'src/**/*.test.ts',
+          'src/**/*.examples.vue',
           'src/docs/**/*.ts',
           'src/**/CRegister*.ts',
         ],
