@@ -1,4 +1,10 @@
 {
   "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@aplicacoesboilerplate/ui-core": ["./src/index.ts"]
+    }
+  },
   "include": ["src/**/*.ts", "src/**/*.vue"]
 }

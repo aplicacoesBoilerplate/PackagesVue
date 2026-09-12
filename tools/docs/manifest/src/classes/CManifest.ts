@@ -1,9 +1,11 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, relative, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import ts from 'typescript';
 
-import type { IManifest, IManifestExport } from '../models/IManifest.model';
+import type { IManifest, IManifestExport, IManifestPreview } from '../models/IManifest.model';
+import type { IRegisteredArtifact, IRegisteredPreview } from '../models/IRegistry.model';
 
 import { parseTypeScriptExport } from '../functions/parseVueComponent/parseTypeScriptExport';
 import { parseVueComponent } from '../functions/parseVueComponent/parseVueComponent';
@@ -22,7 +24,10 @@ export class CManifest {
     const lPackagePath = resolve(pPackageDirectory, 'package.json');
     const lPackageJson = JSON.parse(readFileSync(lPackagePath, 'utf8')) as { name: string };
     const lEntryPath = resolve(pPackageDirectory, 'src/index.ts');
-    const lExports = this.parsePublicExports(pPackageDirectory, lEntryPath);
+    const lArtifacts = await this.getRegisteredArtifacts(pPackageDirectory);
+    const lExports = lArtifacts
+      ? this.parseRegisteredArtifacts(pPackageDirectory, lArtifacts)
+      : this.parsePublicExports(pPackageDirectory, lEntryPath);
 
     const lManifest: IManifest = {
       schemaVersion: '1.1',
@@ -57,7 +62,28 @@ export class CManifest {
     writeFileSync(lOutputPath, `${JSON.stringify(lManifest, null, 2)}\n`, 'utf8');
     writeFileSync(lSnippetsOutputPath, `${JSON.stringify(lSnippets, null, 2)}\n`, 'utf8');
 
+    if (lArtifacts) {
+      this.writePublicEntry(lEntryPath, lArtifacts);
+    }
+
     return lManifest;
+  }
+
+  /**
+   * @description Gera o entry point de um package a partir de seus registros, quando existirem.
+   * @param {string} pPackageDirectory - Diretório do package que poderá ter registros.
+   * @returns Indica se um entry point foi gerado.
+   */
+  public static async generateEntry(pPackageDirectory: string): Promise<boolean> {
+    const lArtifacts = await this.getRegisteredArtifacts(pPackageDirectory);
+
+    if (!lArtifacts) {
+      return false;
+    }
+
+    this.writePublicEntry(resolve(pPackageDirectory, 'src/index.ts'), lArtifacts);
+    this.writePreviewLoaders(pPackageDirectory, lArtifacts);
+    return true;
   }
 
   /**
@@ -110,6 +136,216 @@ export class CManifest {
         );
       });
     });
+  }
+
+  /**
+   * @description Carrega o agregador de registros sem executar os artefatos registrados.
+   * @param {string} pPackageDirectory - Diretório do package analisado.
+   * @returns Artefatos declarados ou undefined quando o package ainda usa o fluxo legado.
+   */
+  private static async getRegisteredArtifacts(
+    pPackageDirectory: string,
+  ): Promise<IRegisteredArtifact[] | undefined> {
+    const lRegisterPath = resolve(pPackageDirectory, 'src/docs/CPackageRegister.ts');
+
+    if (!existsSync(lRegisterPath)) {
+      return undefined;
+    }
+
+    const lModule: unknown = await import(pathToFileURL(lRegisterPath).href);
+
+    if (!this.isPackageRegisterModule(lModule)) {
+      throw new Error(`Registro inválido: ${lRegisterPath}`);
+    }
+
+    const lArtifacts = lModule.default.getArtifacts();
+    this.validateRegisteredArtifacts(lArtifacts, lRegisterPath);
+    return lArtifacts;
+  }
+
+  /**
+   * @description Extrai contratos técnicos dos artefatos declarados no registro.
+   * @param {string} pPackageDirectory - Diretório do package analisado.
+   * @param {IRegisteredArtifact[]} pArtifacts - APIs públicas declaradas.
+   * @returns APIs prontas para serialização no manifesto.
+   */
+  private static parseRegisteredArtifacts(
+    pPackageDirectory: string,
+    pArtifacts: IRegisteredArtifact[],
+  ): IManifestExport[] {
+    return pArtifacts.flatMap((pArtifact) => {
+      const lFilePath = resolve(pPackageDirectory, 'src', pArtifact.source);
+      const lSourcePath = `src/${pArtifact.source.replace(/^\.\//, '')}`;
+      const lExtractedExports =
+        pArtifact.kind === 'component'
+          ? [
+              parseVueComponent(lFilePath, pArtifact.name, lSourcePath, {
+                parseDocumentationAssets: false,
+              }),
+            ]
+          : parseTypeScriptExport(lFilePath, pArtifact.sourceName, pArtifact.name, lSourcePath);
+
+      if (lExtractedExports.length !== 1) {
+        throw new Error(`Não foi possível resolver o registro público: ${pArtifact.id}`);
+      }
+
+      const [lExtractedExport] = lExtractedExports;
+
+      if (lExtractedExport.kind !== pArtifact.kind) {
+        throw new Error(
+          `Categoria divergente no registro ${pArtifact.id}: ${pArtifact.kind} != ${lExtractedExport.kind}`,
+        );
+      }
+
+      const lPreviews = this.readPreviews(pPackageDirectory, pArtifact.previews ?? []);
+
+      return [
+        {
+          ...lExtractedExport,
+          id: pArtifact.id,
+          navigation: pArtifact.navigation,
+          description: pArtifact.description,
+          instructions: pArtifact.instructions,
+          examples: lPreviews.map(({ code: pCode }) => ({ code: pCode })),
+          previews: lPreviews,
+          snippets: pArtifact.snippets ?? [],
+        },
+      ];
+    });
+  }
+
+  /**
+   * @description Lê o código dos cenários declarados sem executá-los.
+   * @param {string} pPackageDirectory - Diretório do package analisado.
+   * @param {IRegisteredPreview[]} pPreviews - Referências declaradas para os cenários.
+   * @returns Previews serializáveis no manifesto.
+   */
+  private static readPreviews(
+    pPackageDirectory: string,
+    pPreviews: IRegisteredPreview[],
+  ): IManifestPreview[] {
+    return pPreviews.map((pPreview) => {
+      const lPreviewPath = resolve(pPackageDirectory, 'src', pPreview.source);
+
+      if (!existsSync(lPreviewPath)) {
+        throw new Error(`Preview não encontrado: ${pPreview.id}`);
+      }
+
+      return {
+        id: pPreview.id,
+        title: pPreview.title,
+        code: readFileSync(lPreviewPath, 'utf8'),
+      };
+    });
+  }
+
+  /**
+   * @description Grava exports estáticos para manter a API consumível por ESM e TypeScript.
+   * @param {string} pEntryPath - Caminho do entry point público.
+   * @param {IRegisteredArtifact[]} pArtifacts - APIs públicas declaradas.
+   */
+  private static writePublicEntry(pEntryPath: string, pArtifacts: IRegisteredArtifact[]): void {
+    const lContent = pArtifacts
+      .map((pArtifact) => {
+        const lSpecifier =
+          pArtifact.sourceName === 'default'
+            ? `default as ${pArtifact.name}`
+            : pArtifact.sourceName === pArtifact.name
+              ? pArtifact.name
+              : `${pArtifact.sourceName} as ${pArtifact.name}`;
+        const lPrefix = pArtifact.typeOnly ? 'export type' : 'export';
+
+        return `${lPrefix} { ${lSpecifier} } from '${pArtifact.source}';`;
+      })
+      .join('\n');
+
+    writeFileSync(pEntryPath, `${lContent}\n`, 'utf8');
+  }
+
+  /**
+   * @description Grava o entry point que Vite compilará em loaders lazy de preview.
+   * @param {string} pPackageDirectory - Diretório do package que contém os previews.
+   * @param {IRegisteredArtifact[]} pArtifacts - APIs públicas declaradas.
+   */
+  private static writePreviewLoaders(
+    pPackageDirectory: string,
+    pArtifacts: IRegisteredArtifact[],
+  ): void {
+    const lOutputPath = resolve(pPackageDirectory, 'src/docs/preview-loaders.generated.ts');
+
+    writeFileSync(lOutputPath, this.renderPreviewLoaders(pArtifacts), 'utf8');
+  }
+
+  /**
+   * @description Cria imports lazy estáticos para previews, sem avaliar conteúdo do manifesto.
+   * @param {IRegisteredArtifact[]} pArtifacts - APIs públicas declaradas.
+   * @returns Módulo TypeScript consumível pela aplicação de documentação.
+   */
+  private static renderPreviewLoaders(pArtifacts: IRegisteredArtifact[]): string {
+    const lPreviews = pArtifacts.flatMap((pArtifact) => pArtifact.previews ?? []);
+    const lEntries = lPreviews.map(
+      (pPreview) =>
+        `PREVIEW_LOADERS[${JSON.stringify(pPreview.id)}] = () => import(${JSON.stringify(`../${pPreview.source.replace(/^\.\//, '')}`)});`,
+    );
+
+    return `export const PREVIEW_LOADERS: Record<string, () => Promise<unknown>> = {};\n\n${lEntries.join('\n')}\n`;
+  }
+
+  /**
+   * @description Valida a forma do módulo agregador carregado pelo gerador.
+   * @param {unknown} pValue - Módulo carregado dinamicamente.
+   * @returns Indica se o valor possui um agregador compatível.
+   */
+  private static isPackageRegisterModule(
+    pValue: unknown,
+  ): pValue is { default: { getArtifacts: () => IRegisteredArtifact[] } } {
+    return (
+      typeof pValue === 'object' &&
+      pValue !== null &&
+      'default' in pValue &&
+      typeof pValue.default === 'function' &&
+      'getArtifacts' in pValue.default &&
+      typeof pValue.default.getArtifacts === 'function'
+    );
+  }
+
+  /**
+   * @description Valida identificadores e referências antes de gerar os artefatos públicos.
+   * @param {IRegisteredArtifact[]} pArtifacts - APIs declaradas pelo package.
+   * @param {string} pRegisterPath - Caminho usado nas mensagens de diagnóstico.
+   */
+  private static validateRegisteredArtifacts(
+    pArtifacts: IRegisteredArtifact[],
+    pRegisterPath: string,
+  ): void {
+    const lArtifactIds = new Set<string>();
+    const lExportNames = new Set<string>();
+    const lPreviewIds = new Set<string>();
+
+    for (const lArtifact of pArtifacts) {
+      if (lArtifactIds.has(lArtifact.id) || lExportNames.has(lArtifact.name)) {
+        throw new Error(`Registro duplicado em ${pRegisterPath}: ${lArtifact.id}`);
+      }
+
+      if (!lArtifact.source.startsWith('./') || lArtifact.source.includes('..')) {
+        throw new Error(`Caminho de registro inválido: ${lArtifact.source}`);
+      }
+
+      lArtifactIds.add(lArtifact.id);
+      lExportNames.add(lArtifact.name);
+
+      for (const lPreview of lArtifact.previews ?? []) {
+        if (lPreviewIds.has(lPreview.id)) {
+          throw new Error(`Preview duplicado em ${pRegisterPath}: ${lPreview.id}`);
+        }
+
+        if (!lPreview.source.startsWith('./') || lPreview.source.includes('..')) {
+          throw new Error(`Caminho de preview inválido: ${lPreview.source}`);
+        }
+
+        lPreviewIds.add(lPreview.id);
+      }
+    }
   }
 
   /**

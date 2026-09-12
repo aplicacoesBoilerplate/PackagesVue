@@ -14,17 +14,23 @@ import { parseProps } from './parseProps';
 import { parseSlots } from './parseSlots';
 import { parseSnippets } from './parseSnippets';
 
+interface IParseVueComponentOptions {
+  parseDocumentationAssets?: boolean;
+}
+
 /**
  * @description Lê um componente Vue e extrai sua API pública e tokens CSS configuráveis.
  * @param {string} pFilePath - Caminho absoluto do arquivo Vue analisado.
  * @param {string} pExportName - Nome público reexportado pelo package.
  * @param {string} pSourcePath - Caminho do componente relativo ao package.
+ * @param {IParseVueComponentOptions} pOptions - Define se assets editoriais legados serão lidos.
  * @returns {IManifestExport} API pública extraída do componente.
  */
 export function parseVueComponent(
   pFilePath: string,
   pExportName: string,
   pSourcePath: string,
+  pOptions: IParseVueComponentOptions = {},
 ): IManifestExport {
   const lSource = readFileSync(pFilePath, 'utf8');
   const { descriptor: lDescriptor, errors: lErrors } = parse(lSource, { filename: pFilePath });
@@ -53,7 +59,7 @@ export function parseVueComponent(
     slots: parseSlots(pFilePath, lScriptContent),
     exposes: parseExposes(pFilePath, lScriptContent),
     cssTokens: lCssTokens,
-    examples: parseExamples(pFilePath),
-    snippets: parseSnippets(pFilePath),
+    examples: pOptions.parseDocumentationAssets === false ? [] : parseExamples(pFilePath),
+    snippets: pOptions.parseDocumentationAssets === false ? [] : parseSnippets(pFilePath),
   };
 }

@@ -32,6 +32,7 @@ export interface IManifest {
  * @property {IManifestSnippet[]} [snippets] - Snippets consumíveis pela CLI.
  */
 export interface IManifestExport {
+  id?: string;
   name: string;
   kind: 'class' | 'component' | 'composable' | 'function' | 'interface' | 'type';
   source: string;
@@ -45,6 +46,10 @@ export interface IManifestExport {
   cssTokens?: IManifestCssToken[];
   examples?: IManifestExample[];
   snippets?: IManifestSnippet[];
+  navigation?: import('./IRegistry.model').IManifestNavigation;
+  description?: string;
+  instructions?: string[];
+  previews?: IManifestPreview[];
 }
 
 /**
@@ -150,6 +155,19 @@ export interface IManifestCssToken {
  * @property {string} code - O código do exemplo que será renderizado na documentação.
  */
 export interface IManifestExample {
+  code: string;
+}
+
+/**
+ * @description Representa um preview executável identificado fora do JSON.
+ *
+ * @property {string} id - Identificador usado pelo loader estático do preview.
+ * @property {string} title - Título exibido para o cenário.
+ * @property {string} code - Código-fonte do mesmo cenário carregável.
+ */
+export interface IManifestPreview {
+  id: string;
+  title: string;
   code: string;
 }
 

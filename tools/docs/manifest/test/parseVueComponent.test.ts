@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import test from 'node:test';
 
+import { CManifest } from '../src/classes/CManifest';
 import { parseEmits } from '../src/functions/parseVueComponent/parseEmits';
 import { parseExposes } from '../src/functions/parseVueComponent/parseExposes';
 import { parseModels } from '../src/functions/parseVueComponent/parseModels';
@@ -17,6 +19,7 @@ const FIXTURE_TYPE_FILE_PATH = resolve(
   import.meta.dirname,
   '../../../../packages/ui/core/src/components/bases/overlay/types/BaseOverlay.types.ts',
 );
+const CORE_PACKAGE_DIRECTORY = resolve(import.meta.dirname, '../../../../packages/ui/core');
 const MACROS_SOURCE = `
 const lEmit = defineEmits<{
   saved: [pId: string];
@@ -97,4 +100,25 @@ test('extrai emits, models, slots e exposes tipados', () => {
     },
     { name: 'lState', kind: 'property', type: 'string' },
   ]);
+});
+
+test('gera API registrada, snippets e loaders de preview sem executar o exemplo', async () => {
+  await CManifest.generateEntry(CORE_PACKAGE_DIRECTORY);
+  const lManifest = await CManifest.generate(CORE_PACKAGE_DIRECTORY);
+  const lBaseOverlay = lManifest.exports.find((pExport) => pExport.id === 'base-overlay');
+  const lEntryPoint = readFileSync(resolve(CORE_PACKAGE_DIRECTORY, 'src/index.ts'), 'utf8');
+  const lPreviewLoaders = readFileSync(
+    resolve(CORE_PACKAGE_DIRECTORY, 'src/docs/preview-loaders.generated.ts'),
+    'utf8',
+  );
+  const lSnippets = JSON.parse(
+    readFileSync(resolve(CORE_PACKAGE_DIRECTORY, 'dist/snippets.json'), 'utf8'),
+  ) as Record<string, unknown>;
+
+  assert.deepEqual(lBaseOverlay?.navigation, { group: 'Componentes', order: 10 });
+  assert.equal(lBaseOverlay?.previews?.[0]?.id, 'base-overlay-default');
+  assert.equal(lBaseOverlay?.snippets?.[0]?.id, 'ab-base-overlay');
+  assert.match(lEntryPoint, /export \{ default as BaseOverlay \}/);
+  assert.match(lPreviewLoaders, /base-overlay-default/);
+  assert.ok('ab-base-overlay' in lSnippets);
 });

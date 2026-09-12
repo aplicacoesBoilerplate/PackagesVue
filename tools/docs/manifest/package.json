@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "generate": "tsx src/index.ts",
+    "generate:entry": "tsx src/index.ts --entry",
     "test": "tsx --test test/parseVueComponent.test.ts"
   },
   "devDependencies": {
