@@ -2,9 +2,9 @@ name: CI
 
 on:
   pull_request:
-    branches: [master]
+    branches: [master, 'release/**']
   push:
-    branches: [master]
+    branches: [master, 'release/**']
 
 permissions:
   contents: read
@@ -12,6 +12,9 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -31,8 +34,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          key: ${{ runner.os }}-turbo-${{ github.ref_name }}-${{ github.sha }}
           restore-keys: |
+            ${{ runner.os }}-turbo-${{ github.ref_name }}-
             ${{ runner.os }}-turbo-
 
       - name: Require changeset for package changes

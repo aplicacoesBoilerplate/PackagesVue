@@ -36,6 +36,7 @@
     "primevue": "^4.5.5"
   },
   "devDependencies": {
+    "@aplicacoesboilerplate/docs-manifest": "^0.0.1",
     "primevue": "^4.5.5"
   },
   "scripts": {
