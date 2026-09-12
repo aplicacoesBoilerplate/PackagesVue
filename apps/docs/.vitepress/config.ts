@@ -3,36 +3,33 @@ import { fileURLToPath, URL } from 'node:url';
 
 import { defineConfig } from 'vitepress';
 
-const docsBase = process.env.DOCS_BASE || '/';
-const normalizedDocsBase = docsBase === '/' ? docsBase : `${docsBase.replace(/\/$/, '')}/`;
+import { NAVIGATION, SIDEBAR } from './generated/navigation';
+
+const lDocsBase = process.env.DOCS_BASE || '/';
+const lNormalizedDocsBase = lDocsBase === '/' ? lDocsBase : `${lDocsBase.replace(/\/$/, '')}/`;
 
 export default defineConfig({
-  base: normalizedDocsBase,
+  base: lNormalizedDocsBase,
   title: 'Aplicacoes Boilerplate UI',
   description: 'Catálogo de componentes Vue reutilizáveis.',
   head: [
-    ['link', { rel: 'icon', href: `${normalizedDocsBase}favicon.svg`, type: 'image/svg+xml' }],
+    ['link', { rel: 'icon', href: `${lNormalizedDocsBase}favicon.svg`, type: 'image/svg+xml' }],
   ],
   themeConfig: {
-    nav: [
-      { text: 'Início', link: '/' },
-      { text: 'Componentes', link: '/componentes/base-overlay' },
-    ],
-    sidebar: {
-      '/componentes/': [
-        {
-          text: 'Bases',
-          items: [{ text: 'BaseOverlay', link: '/componentes/base-overlay' }],
-        },
-      ],
-    },
-    socialLinks: [{ icon: 'github', link: 'https://github.com/aplicacoesBoilerplate' }],
+    nav: NAVIGATION,
+    sidebar: SIDEBAR,
   },
   vite: {
     resolve: {
       alias: {
-        '@aplicacoesboilerplate/ui': fileURLToPath(
-          new URL('../../../packages/ui/src/index.ts', import.meta.url),
+        '@aplicacoesboilerplate/ui-core': fileURLToPath(
+          new URL('../../../packages/ui/core/src/index.ts', import.meta.url),
+        ),
+        '@aplicacoesboilerplate/ui-prime-vue': fileURLToPath(
+          new URL('../../../packages/ui/prime-vue/src/index.ts', import.meta.url),
+        ),
+        '@aplicacoesboilerplate/ui-vuetify': fileURLToPath(
+          new URL('../../../packages/ui/vuetify/src/index.ts', import.meta.url),
         ),
       },
     },

@@ -1,12 +1,15 @@
 {
   "name": "@aplicacoesboilerplate/packages-vue",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
-  "packageManager": "npm@11.8.0",
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/composables",
+    "packages/utils",
+    "packages/ui/*",
+    "tools/docs/manifest",
+    "tools/docs/catalog"
   ],
   "scripts": {
     "build": "turbo run build",
@@ -16,6 +19,7 @@
     "verify": "turbo run lint type-check test build",
     "changeset": "changeset",
     "dev:docs": "npm run dev --workspace @aplicacoesboilerplate/docs",
+    "generate:docs-catalog": "npm run generate --workspace @aplicacoesboilerplate/docs-catalog",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "lint:fix": "eslint --config config/eslint.config.js . --fix",
@@ -37,6 +41,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-simple-import-sort": "^14.0.0",
     "eslint-plugin-vue": "^10.9.2",
+    "eslint-plugin-jsdoc": "^63.3.3",
     "happy-dom": "^20.11.2",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
@@ -62,5 +67,11 @@
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "^4.62.4"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "npm",
+      "version": "10.9.4"
+    }
   }
 }

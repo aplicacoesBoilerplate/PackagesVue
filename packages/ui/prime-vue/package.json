@@ -1,0 +1,43 @@
+{
+  "name": "@aplicacoesboilerplate/ui-prime-vue",
+  "version": "0.0.1",
+  "description": "Componentes Vue reutilizáveis com componente da biblioteca do PrimeVue da organização Aplicações Boilerplate.",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./style.css": "./dist/style.css",
+    "./manifest": "./dist/docs.manifest.json",
+    "./snippets": "./dist/snippets.json"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0",
+    "primevue": "^4.5.5"
+  },
+  "devDependencies": {
+    "primevue": "^4.5.5"
+  },
+  "scripts": {
+    "build": "vite build",
+    "postbuild": "npm run generate --workspace @aplicacoesboilerplate/docs-manifest -- ../../../packages/ui/prime-vue",
+    "prepack": "npm run build",
+    "pack:check": "npm pack --dry-run",
+    "type-check": "vue-tsc --noEmit -p tsconfig.json"
+  }
+}
