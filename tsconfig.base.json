@@ -2,6 +2,11 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      // Packages publicos
+      "@aplicacoesboilerplate/ui-core": ["./packages/ui/core/src/index.ts"],
+      "@aplicacoesboilerplate/ui-prime-vue": ["./packages/ui/prime-vue/src/index.ts"],
+      "@aplicacoesboilerplate/ui-vuetify": ["./packages/ui/vuetify/src/index.ts"],
+
       // Packages
       "@core": ["./packages/ui/core/src/index.ts"],
       "@core/*": ["./packages/ui/core/src/*"],

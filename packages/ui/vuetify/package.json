@@ -36,6 +36,7 @@
     "vuetify": "^4.2.0"
   },
   "devDependencies": {
+    "@aplicacoesboilerplate/docs-manifest": "^0.0.1",
     "vuetify": "^4.2.0"
   },
   "scripts": {

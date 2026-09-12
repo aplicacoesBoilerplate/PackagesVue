@@ -1,0 +1,13 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "test": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/packages/ui/core/**",
+        "$TURBO_ROOT$/packages/ui/prime-vue/**",
+        "$TURBO_ROOT$/packages/ui/vuetify/**"
+      ]
+    }
+  }
+}

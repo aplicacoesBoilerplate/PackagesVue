@@ -1,14 +1,27 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [
+    "package-lock.json",
+    "tsconfig.base.json",
+    "vite.config.base.ts",
+    "config/**"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".vitepress/dist/**"]
+      "outputs": ["dist/**", "generated/**", ".vitepress/generated/**", ".vitepress/dist/**"]
     },
-    "lint": {},
+    "lint": {
+      "dependsOn": ["^lint"],
+      "outputs": []
+    },
     "test": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "outputs": []
     },
-    "type-check": {}
+    "type-check": {
+      "dependsOn": ["^type-check"],
+      "outputs": []
+    }
   }
 }

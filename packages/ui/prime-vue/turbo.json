@@ -1,0 +1,12 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "type-check": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/tools/docs/manifest/src/**",
+        "$TURBO_ROOT$/tools/docs/manifest/tsconfig.json"
+      ]
+    }
+  }
+}

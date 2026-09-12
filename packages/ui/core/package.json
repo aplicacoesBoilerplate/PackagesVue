@@ -34,6 +34,9 @@
   "peerDependencies": {
     "vue": "^3.5.0"
   },
+  "devDependencies": {
+    "@aplicacoesboilerplate/docs-manifest": "^0.0.1"
+  },
   "scripts": {
     "prebuild": "npm run generate:entry --workspace @aplicacoesboilerplate/docs-manifest -- ../../../packages/ui/core",
     "build": "vite build",
