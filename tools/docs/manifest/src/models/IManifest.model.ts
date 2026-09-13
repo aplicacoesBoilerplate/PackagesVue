@@ -18,7 +18,7 @@ export interface IManifest {
  * opcionais porque funções, classes, interfaces e types não possuem essa API.
  *
  * @property {string} name - Nome público do export.
- * @property {'class' | 'component' | 'composable' | 'function' | 'interface' | 'type'} kind - Categoria da API.
+ * @property {'class' | 'component' | 'composable' | 'function' | 'interface' | 'service' | 'type'} kind - Categoria da API.
  * @property {string} source - Caminho do fonte relativo ao package.
  * @property {IManifestProp[]} [props] - Props públicas do componente.
  * @property {IManifestEmit[]} [emits] - Eventos públicos emitidos pelo componente.
@@ -27,6 +27,12 @@ export interface IManifest {
  * @property {IManifestExpose[]} [exposes] - Membros expostos para template refs.
  * @property {IManifestParameter[]} [parameters] - Parâmetros de funções e composables.
  * @property {string} [returnType] - Tipo de retorno de funções e composables.
+ * @property {boolean} [abstract] - Indica se uma classe é abstrata.
+ * @property {IManifestTypeParameter[]} [typeParameters] - Parâmetros genéricos de classes.
+ * @property {string} [extends] - Classe base declarada.
+ * @property {string[]} [implements] - Contratos implementados pela classe.
+ * @property {IManifestClassConstructor[]} [constructors] - Construtores públicos da classe.
+ * @property {IManifestClassMember[]} [members] - Membros públicos da classe.
  * @property {IManifestCssToken[]} [cssTokens] - Tokens CSS configuráveis.
  * @property {IManifestExample[]} [examples] - Exemplos renderizados na documentação.
  * @property {IManifestSnippet[]} [snippets] - Snippets consumíveis pela CLI.
@@ -34,7 +40,7 @@ export interface IManifest {
 export interface IManifestExport {
   id?: string;
   name: string;
-  kind: 'class' | 'component' | 'composable' | 'function' | 'interface' | 'type';
+  kind: 'class' | 'component' | 'composable' | 'function' | 'interface' | 'service' | 'type';
   source: string;
   props?: IManifestProp[];
   emits?: IManifestEmit[];
@@ -43,6 +49,12 @@ export interface IManifestExport {
   exposes?: IManifestExpose[];
   parameters?: IManifestParameter[];
   returnType?: string;
+  abstract?: boolean;
+  typeParameters?: IManifestTypeParameter[];
+  extends?: string;
+  implements?: string[];
+  constructors?: IManifestClassConstructor[];
+  members?: IManifestClassMember[];
   cssTokens?: IManifestCssToken[];
   examples?: IManifestExample[];
   snippets?: IManifestSnippet[];
@@ -50,6 +62,46 @@ export interface IManifestExport {
   description?: string;
   instructions?: string[];
   previews?: IManifestPreview[];
+}
+
+/**
+ * @description Representa um parâmetro genérico declarado por uma classe.
+ * @property {string} name - Nome do parâmetro genérico.
+ * @property {string} [constraint] - Restrição declarada para o parâmetro.
+ * @property {string} [default] - Valor padrão declarado para o parâmetro.
+ */
+export interface IManifestTypeParameter {
+  name: string;
+  constraint?: string;
+  default?: string;
+}
+
+/**
+ * @description Representa um construtor público de classe.
+ * @property {IManifestParameter[]} parameters - Parâmetros aceitos pelo construtor.
+ */
+export interface IManifestClassConstructor {
+  parameters: IManifestParameter[];
+}
+
+/**
+ * @description Representa um membro público de classe.
+ * @property {string} name - Nome do membro público.
+ * @property {'method' | 'property'} kind - Categoria do membro.
+ * @property {boolean} static - Indica se o membro é estático.
+ * @property {string} type - Tipo da propriedade ou assinatura do método.
+ * @property {IManifestParameter[]} [parameters] - Parâmetros do método.
+ * @property {string} [returnType] - Retorno do método.
+ * @property {boolean} [abstract] - Indica se o método é abstrato.
+ */
+export interface IManifestClassMember {
+  name: string;
+  kind: 'method' | 'property';
+  static: boolean;
+  type: string;
+  parameters?: IManifestParameter[];
+  returnType?: string;
+  abstract?: boolean;
 }
 
 /**
