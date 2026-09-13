@@ -180,7 +180,13 @@ export class CManifest {
                 parseDocumentationAssets: false,
               }),
             ]
-          : parseTypeScriptExport(lFilePath, pArtifact.sourceName, pArtifact.name, lSourcePath);
+          : parseTypeScriptExport(
+              lFilePath,
+              pArtifact.sourceName,
+              pArtifact.name,
+              lSourcePath,
+              pArtifact.kind,
+            );
 
       if (lExtractedExports.length !== 1) {
         throw new Error(`Não foi possível resolver o registro público: ${pArtifact.id}`);

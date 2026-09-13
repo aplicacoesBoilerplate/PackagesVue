@@ -4,6 +4,7 @@ import ts from 'typescript';
 
 import type { IManifestExport } from '../../models/IManifest.model';
 
+import { parseTypeScriptClass } from './parseTypeScriptClass';
 import { getManifestParameters } from './resolveTypeDeclaration';
 
 /**
@@ -12,6 +13,7 @@ import { getManifestParameters } from './resolveTypeDeclaration';
  * @param {string} pSourceName - Nome local da declaração exportada.
  * @param {string} pExportName - Nome público reexportado pelo package.
  * @param {string} pSourcePath - Caminho da declaração relativo ao package.
+ * @param {IManifestExport['kind']} [pKind] - Categoria editorial declarada pelo registro.
  * @returns {IManifestExport[]} API pública encontrada no arquivo.
  */
 export function parseTypeScriptExport(
@@ -19,6 +21,7 @@ export function parseTypeScriptExport(
   pSourceName: string,
   pExportName: string,
   pSourcePath: string,
+  pKind?: IManifestExport['kind'],
 ): IManifestExport[] {
   const lSource = readFileSync(pFilePath, 'utf8');
   const lSourceFile = ts.createSourceFile(
@@ -43,13 +46,13 @@ export function parseTypeScriptExport(
     }
 
     if (ts.isClassDeclaration(pStatement) && pStatement.name?.text === pSourceName) {
-      return [
-        {
-          name: pExportName,
-          kind: 'class',
-          source: pSourcePath,
-        },
-      ];
+      return parseTypeScriptClass(
+        pFilePath,
+        pSourceName,
+        pExportName,
+        pSourcePath,
+        pKind === 'service' ? 'service' : 'class',
+      );
     }
 
     if (ts.isInterfaceDeclaration(pStatement) && pStatement.name.text === pSourceName) {

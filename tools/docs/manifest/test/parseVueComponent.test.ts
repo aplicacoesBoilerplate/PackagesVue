@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { cpSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import test from 'node:test';
 
@@ -125,6 +125,89 @@ test('extrai emits, models, slots e exposes tipados', () => {
     },
     { name: 'lState', kind: 'property', type: 'string' },
   ]);
+});
+
+test('extrai apenas o contrato público de classes abstratas e services', () => {
+  const lTemporaryDirectory = mkdtempSync(resolve(import.meta.dirname, '.tmp-typescript-class-'));
+  const lFilePath = resolve(lTemporaryDirectory, 'CUserService.ts');
+
+  try {
+    writeFileSync(
+      lFilePath,
+      `interface IEntity { id: string; }
+interface IUser extends IEntity { name: string; }
+interface IUserRepository { findById(pId: string): IUser | undefined; }
+
+export abstract class CBaseRepository<TEntity extends IEntity = IEntity> {
+  public readonly count = 0;
+  protected readonly cache = new Map<string, TEntity>();
+  private readonly token = 'private';
+
+  public constructor(public readonly endpoint: string, pEnabled = true) {}
+
+  public abstract save(pEntity: TEntity): Promise<TEntity>;
+
+  public find<TFilter extends object>(pFilter: TFilter): TEntity[] {
+    return [];
+  }
+
+  protected clear(): void {}
+  private sign(): string { return this.token; }
+}
+
+export class CUserService extends CBaseRepository<IUser> implements IUserRepository {
+  public static readonly scope = 'users';
+
+  public findById(pId: string): IUser | undefined {
+    return undefined;
+  }
+}
+`,
+      'utf8',
+    );
+
+    const [lBaseRepository] = parseTypeScriptExport(
+      lFilePath,
+      'CBaseRepository',
+      'CBaseRepository',
+      'src/classes/CBaseRepository.ts',
+    );
+    const [lUserService] = parseTypeScriptExport(
+      lFilePath,
+      'CUserService',
+      'CUserService',
+      'src/services/CUserService.ts',
+      'service',
+    );
+
+    assert.equal(lBaseRepository?.kind, 'class');
+    assert.equal(lBaseRepository?.abstract, true);
+    assert.deepEqual(lBaseRepository?.typeParameters, [
+      { name: 'TEntity', constraint: 'IEntity', default: 'IEntity' },
+    ]);
+    assert.deepEqual(lBaseRepository?.constructors, [
+      {
+        parameters: [
+          { name: 'endpoint', type: 'string', optional: false },
+          { name: 'pEnabled', type: 'boolean', optional: true },
+        ],
+      },
+    ]);
+    assert.deepEqual(lBaseRepository?.members?.map((pMember) => pMember.name).sort(), [
+      'count',
+      'find',
+      'save',
+    ]);
+    assert.equal(
+      lBaseRepository?.members?.find((pMember) => pMember.name === 'save')?.abstract,
+      true,
+    );
+    assert.equal(lUserService?.kind, 'service');
+    assert.equal(lUserService?.extends, 'CBaseRepository<IUser>');
+    assert.deepEqual(lUserService?.implements, ['IUserRepository']);
+  } finally {
+    rmSync(lTemporaryDirectory, { force: true, recursive: true });
+  }
 });
 
 test('gera APIs registradas, snippets e loaders de preview sem executar os exemplos', async () => {
