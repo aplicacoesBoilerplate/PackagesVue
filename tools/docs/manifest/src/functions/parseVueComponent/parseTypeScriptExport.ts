@@ -37,10 +37,11 @@ export function parseTypeScriptExport(
       return [
         {
           name: pExportName,
-          kind: pExportName.startsWith('use') ? 'composable' : 'function',
+          kind: getCallableKind(pExportName, pKind),
           source: pSourcePath,
           parameters: getManifestParameters(pStatement.parameters, lSourceFile),
           returnType: pStatement.type?.getText(lSourceFile) ?? 'void',
+          typeParameters: getTypeParameters(pStatement, lSourceFile),
         },
       ];
     }
@@ -97,11 +98,46 @@ export function parseTypeScriptExport(
     return [
       {
         name: pExportName,
-        kind: pExportName.startsWith('use') ? 'composable' : 'function',
+        kind: getCallableKind(pExportName, pKind),
         source: pSourcePath,
         parameters: getManifestParameters(lInitializer.parameters, lSourceFile),
         returnType: lInitializer.type?.getText(lSourceFile) ?? 'void',
+        typeParameters: getTypeParameters(lInitializer, lSourceFile),
       },
     ];
   });
+}
+
+/**
+ * @description Resolve a categoria de uma API callable sem inferir registros declarativos.
+ * @param {string} pExportName - Nome público da API callable.
+ * @param {IManifestExport['kind']} [pKind] - Categoria declarada pelo registro.
+ * @returns Categoria serializável da API.
+ */
+function getCallableKind(
+  pExportName: string,
+  pKind: IManifestExport['kind'] | undefined,
+): 'composable' | 'function' {
+  return pKind === 'composable' || (!pKind && pExportName.startsWith('use'))
+    ? 'composable'
+    : 'function';
+}
+
+/**
+ * @description Extrai parâmetros genéricos declarados por uma função ou arrow function.
+ * @param {ts.SignatureDeclarationBase} pDeclaration - Declaração callable analisada.
+ * @param {ts.SourceFile} pSourceFile - Fonte usada para preservar os tipos declarados.
+ * @returns Parâmetros genéricos serializáveis, quando existirem.
+ */
+function getTypeParameters(
+  pDeclaration: ts.SignatureDeclarationBase,
+  pSourceFile: ts.SourceFile,
+): IManifestExport['typeParameters'] {
+  const lTypeParameters = pDeclaration.typeParameters?.map((pParameter) => ({
+    name: pParameter.name.text,
+    ...(pParameter.constraint ? { constraint: pParameter.constraint.getText(pSourceFile) } : {}),
+    ...(pParameter.default ? { default: pParameter.default.getText(pSourceFile) } : {}),
+  }));
+
+  return lTypeParameters && lTypeParameters.length > 0 ? lTypeParameters : undefined;
 }
