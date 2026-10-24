@@ -16,6 +16,8 @@ publish-artifacts=false bloqueia npm publish. O antigo workflow Changesets foi s
 
 Node22 e npm10.9.4 (devEngines) são usados na CI. npm é fixado antes da instalação, fora do diretório do projeto. Localmente, executar com npm10.9.4: npm ci, npm run verify -- --force e npm run pack:check. verify preserva lint/type-check/test/build; os workspaces atuais não declaram tarefa lint própria, portanto esse nome no Turbo não comprova lint adicional.
 
+O cache automático npm do setup-node fica desabilitado: ele chama npm antes do passo que fixa a versão e o npm10.9.9 do runner viola devEngines. Essa falha foi reproduzida no primeiro CI remoto; a correção preserva a restrição npm10.9.4, sem relaxar o contrato. O cache Turbo permanece ativo.
+
 A suíte central usa o motor/plugin reais para incremento independente, dependente privado, lockfile e exclusão da Release privada. T5: implementação e gate local aprovados, 17/17 tarefas verify executadas sem cache, pack:check das cinco bibliotecas e contrato YAML/seeds/privados/escritores antigos aprovado. Composables/utils usam passWithNoTests preexistente e não têm testes próprios; não se contabilizam como cobertura funcional. A instalação da baseline reportou 16 vulnerabilidades preexistentes (6 moderadas, 9 altas, 1 crítica); upgrades gerais ficam fora desta integração. O commit é publicado antes da tarefa seguinte.
 
 Integração em codex/release-please-stage1 para release/v0.0.1; não promove features a master. O ciclo hospedado de PR/tag/Release segue pendente dos merges humanos pelo Git Flow da aplicação. Uma entrega fix:/feat: depois da base bootstrap deve exercitar esse ciclo; conferir os pacotes afetados e nenhuma distribuição antes de integrar o PR técnico.
