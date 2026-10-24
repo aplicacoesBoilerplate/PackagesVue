@@ -28,7 +28,6 @@ npm run lint
 npm run type-check
 npm run test
 npm run pack:check
-npm run changeset
 npm run dev:docs
 ```
 
@@ -58,30 +57,11 @@ pacotes adicionais para consultar o catálogo publicado.
 
 ## Versionamento e publicação
 
-O monorepo usa Changesets para versões independentes por pacote. Para toda alteração publicável:
+O monorepo usa o Release Please centralizado, com versões independentes e um caller mantido nesta aplicação. [Configuração, versões iniciais e roteiro da etapa 1](docs/versioning.md).
 
-```bash
-npm run changeset
-```
+O PR funcional para master precisa de milestone SemVer; cada pacote mantém seu cálculo nativo. Após o merge humano, a pipeline prepara o PR técnico. O merge desse segundo PR cria tags e GitHub Releases automaticamente. A etapa 1 não publica em registry; distribuição será tratada separadamente.
 
-Selecione os pacotes afetados e o incremento semântico adequado. Inclua o arquivo criado em
-`.changeset/` no commit. Pull requests que alteram `packages/*` sem changeset são recusadas pela CI.
-
-O changeset incluído para `BaseOverlay` é `minor`: partindo de `@aplicacoesboilerplate/ui@1.0.0`, a
-pull request de release preparará a versão `1.1.0` para publicação.
-
-mesclagem dessa pull request atualiza versões e changelogs e publica os artefatos no GitHub Packages.
-Após a mesclagem em `master`, a workflow `Release` cria ou atualiza uma pull request de versão. A
-mesclagem dessa pull request atualiza versões e changelogs e publica os artefatos no GitHub Packages.
-mesclagem dessa pull request atualiza versões e changelogs e publica os artefatos no GitHub Packages.
-
-Os hooks do Husky executam Commitlint no commit, lint-staged antes do commit e `npm run verify`
-antes do push. Eles não incrementam versões: a escolha explícita no Changeset evita versões erradas
-quando uma mudança afeta mais de um pacote.
-
-Para permitir a criação da pull request de versão, configure o secret `RELEASE_TOKEN` com um token
-fine-grained que tenha acesso ao repositório e permissões **Contents: Read and write** e
-**Pull requests: Read and write**. Um PAT classic com o escopo `repo` também é aceito.
+Conventional Commits continuam exigidos pelos hooks. Changesets deixou de ser um gate de PR e de controlar versões/publicação automaticamente. Não é necessário um RELEASE_TOKEN adicional para este fluxo: usa GITHUB_TOKEN, respeitando a política de criação de PRs do repositório.
 
 ## Consumo privado
 
@@ -98,5 +78,4 @@ Depois, instale normalmente:
 npm install @aplicacoesboilerplate/ui
 ```
 
-O token nunca deve ser salvo no repositório. A CI de publicação usa `GITHUB_TOKEN` com permissão
-`packages: write`.
+O token nunca deve ser salvo no repositório. A publicação no registry pertence à etapa 2.
