@@ -18,6 +18,8 @@ Node22 e npm10.9.4 (devEngines) são usados na CI. npm é fixado antes da instal
 
 O cache automático npm do setup-node fica desabilitado: ele chama npm antes do passo que fixa a versão e o npm10.9.9 do runner viola devEngines. Essa falha foi reproduzida no primeiro CI remoto; a correção preserva a restrição npm10.9.4, sem relaxar o contrato. O cache Turbo permanece ativo.
 
+O segundo CI limpo expôs uma corrida preexistente: exemplos importam o próprio pacote por sua API pública em dist/, mas type-check começava antes do build. O grafo Turbo agora exige o build do próprio workspace antes de type-check. Nenhum exemplo, teste ou verificação foi excluído; o diagnóstico TS2307 do runner é a evidência RED dessa correção.
+
 A suíte central usa o motor/plugin reais para incremento independente, dependente privado, lockfile e exclusão da Release privada. T5: implementação e gate local aprovados, 17/17 tarefas verify executadas sem cache, pack:check das cinco bibliotecas e contrato YAML/seeds/privados/escritores antigos aprovado. Composables/utils usam passWithNoTests preexistente e não têm testes próprios; não se contabilizam como cobertura funcional. A instalação da baseline reportou 16 vulnerabilidades preexistentes (6 moderadas, 9 altas, 1 crítica); upgrades gerais ficam fora desta integração. O commit é publicado antes da tarefa seguinte.
 
 Integração em codex/release-please-stage1 para release/v0.0.1; não promove features a master. O ciclo hospedado de PR/tag/Release segue pendente dos merges humanos pelo Git Flow da aplicação. Uma entrega fix:/feat: depois da base bootstrap deve exercitar esse ciclo; conferir os pacotes afetados e nenhuma distribuição antes de integrar o PR técnico.

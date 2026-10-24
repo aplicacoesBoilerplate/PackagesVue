@@ -9,6 +9,8 @@
     "test": {
       "dependsOn": ["^build"]
     },
-    "type-check": {}
+    "type-check": {
+      "dependsOn": ["build"]
+    }
   }
 }
