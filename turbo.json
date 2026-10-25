@@ -5,6 +5,16 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".vitepress/dist/**"]
     },
+    "@aplicacoesboilerplate/docs#build": {
+      "dependsOn": ["^build"],
+      "outputs": [".vitepress/dist/**"],
+      "env": ["DOCS_BASE", "DOCS_SOURCE_SHA"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/release-please-config.json",
+        "$TURBO_ROOT$/packages/**/package.json"
+      ]
+    },
     "lint": {},
     "test": {
       "dependsOn": ["^build"]
