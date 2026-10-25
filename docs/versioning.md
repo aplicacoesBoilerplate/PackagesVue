@@ -1,8 +1,8 @@
 # Versionamento do workspace: etapa 1
 
-O caller pertence a esta aplicação: .github/workflows/release.yml. Ele aguarda a CI do commit integrado em master e chama o central/scripts na mesma revisão 1d874d946e5f5ad233a6b1f6bf278fef78f3b46d. Apenas o job de release recebe escrita; sem secrets de registry herdados.
+O caller pertence a esta aplicação: .github/workflows/release.yml. Ele aguarda a CI do commit integrado em master e chama o central/scripts na mesma revisão 080df5aa1c803252ba91fa00ac529fc5e2006c47. Apenas o job de release recebe escrita; sem secrets de registry herdados.
 
-As cinco bibliotecas mantêm versões independentes. O Release Please calcula cada incremento pelos Conventional Commits e gera um PR técnico conjunto com versões, changelogs e lockfile. A milestone SemVer continua obrigatória na entrega funcional, inclusive hotfix, mas nesta política native ela agrupa a entrega: não força uma versão escalar em todos os pacotes. Depois da revisão, CI e merge do PR técnico, o motor publica tags/GitHub Releases dos componentes alterados, sem exigir outra milestone.
+As cinco bibliotecas mantêm versões independentes. O Release Please calcula cada incremento pelos Conventional Commits e gera um PR técnico conjunto com versões, changelogs e lockfile. O contrato atual usa config-file/manifest-file/project-path e valida versões declaradas por milestone ou Release-As contra as tags do componente. Uma declaração global só pode identificar um componente; em entregas multipacote, preserve o cálculo nativo ou declare release-as por pacote no config. Depois da revisão, CI e merge do PR técnico, o motor publica tags/GitHub Releases dos componentes alterados, sem exigir outra milestone.
 
 Os seeds refletem a branch real da migração: composables/utils/ui-core/ui-prime-vue 0.0.1 e ui-vuetify 1.1.1. Tags usam o nome completo, como @aplicacoesboilerplate/ui-vuetify@1.1.2. A tag antiga ui@1.1.1 continua intacta e não corresponde aos componentes novos. bootstrap-sha marca a base anterior à integração; o manifest evita downgrade ao migrar os nomes.
 
@@ -24,4 +24,10 @@ A suíte central usa o motor/plugin reais para incremento independente, dependen
 
 Integração em codex/release-please-stage1 para release/v0.0.1; não promove features a master. O ciclo hospedado de PR/tag/Release segue pendente dos merges humanos pelo Git Flow da aplicação. Uma entrega fix:/feat: depois da base bootstrap deve exercitar esse ciclo; conferir os pacotes afetados e nenhuma distribuição antes de integrar o PR técnico.
 
-[Contrato central](https://github.com/aplicacoesBoilerplate/.github/blob/1d874d946e5f5ad233a6b1f6bf278fef78f3b46d/docs/pipelines/versionamento-release-please.md).
+[Contrato central](https://github.com/aplicacoesBoilerplate/.github/blob/080df5aa1c803252ba91fa00ac529fc5e2006c47/docs/pipelines/versionamento-release-please.md).
+
+## Iteração documental T3
+
+O site tem páginas dos cinco pacotes com versão/instalação do mesmo checkout e preserva o catálogo UI, seus previews e a API existente. Composables e utils indicam seus pontos de entrada ainda vazios; nenhuma feature pendente foi incorporada. A versão de apps/docs e schemaVersion não representam as bibliotecas.
+
+Gate local aprovado: npm10.9.4 verify -- --force --concurrency=1, 17/17 tarefas sem cache, incluindo o VitePress real. O buildEnd exige versões e comandos de instalação nas cinco páginas e manifesta/export/API não vazia nas três bibliotecas UI. O caller documental usa o central fixado, install-dir raiz, build-script build e base /PackagesVue/. Pages foi habilitado pelo administrador; a publicação ainda aguarda promoção humana para master.
