@@ -32,6 +32,7 @@ export interface IManifest {
  * @property {IManifestSnippet[]} [snippets] - Snippets consumíveis pela CLI.
  */
 export interface IManifestExport {
+  id?: string;
   name: string;
   kind: 'class' | 'component' | 'composable' | 'function' | 'interface' | 'type';
   source: string;
@@ -45,6 +46,10 @@ export interface IManifestExport {
   cssTokens?: IManifestCssToken[];
   examples?: IManifestExample[];
   snippets?: IManifestSnippet[];
+  navigation?: IManifestNavigation;
+  description?: string;
+  instructions?: string[];
+  previews?: IManifestPreview[];
 }
 
 /**
@@ -154,6 +159,19 @@ export interface IManifestExample {
 }
 
 /**
+ * @description Representa um preview executável identificado fora do JSON.
+ *
+ * @property {string} id - Identificador usado pelo loader estático do preview.
+ * @property {string} title - Título exibido para o cenário.
+ * @property {string} code - Código-fonte do mesmo cenário carregável.
+ */
+export interface IManifestPreview {
+  id: string;
+  title: string;
+  code: string;
+}
+
+/**
  * @description Interface para o manifest gerar um snippet de código de cada componente do package.
  * @property {string} id - Identificador do snippet.
  * @property {string[]} prefix - Semelhante ao identificador, prefixos servem para acionamento na IDE.
@@ -167,4 +185,15 @@ export interface IManifestSnippet {
   description: string;
   scope: string;
   body: string[];
+}
+
+/**
+ * @description Metadados de navegação editoriais de uma API pública.
+ *
+ * @property {string} group - Grupo que receberá a API na documentação.
+ * @property {number} order - Ordem da API dentro do grupo.
+ */
+export interface IManifestNavigation {
+  group: string;
+  order: number;
 }

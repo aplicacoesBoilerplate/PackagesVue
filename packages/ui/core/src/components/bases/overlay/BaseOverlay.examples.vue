@@ -1,5 +1,8 @@
 <template>
-  <BaseOverlay :modelValue="rIsLoading" message="Salvando dados..." />
+  <BaseOverlay
+    :modelValue="rIsLoading"
+    message="Salvando dados..."
+  />
 </template>
 
 <script setup lang="ts">

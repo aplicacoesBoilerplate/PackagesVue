@@ -56,11 +56,11 @@ const rIsLoading = ref(false);
 
 ## Snippets
 
-### `ab-base-overlay`
+### `core-base-overlay`
 
 Insere um BaseOverlay controlado por estado reativo.
 
-**Prefixos:** `ab-base-overlay`
+**Prefixos:** `core-base-overlay`
 
 ```vue
 <BaseOverlay :modelValue="${1:lIsLoading}" message="${2:Carregando...}" />

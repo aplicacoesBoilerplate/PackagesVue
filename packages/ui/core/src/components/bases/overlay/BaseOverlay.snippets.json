@@ -1,6 +1,6 @@
 {
-  "ab-base-overlay": {
-    "prefix": ["ab-base-overlay"],
+  "core-base-overlay": {
+    "prefix": ["core-base-overlay"],
     "description": "Insere um BaseOverlay controlado por estado reativo.",
     "scope": "vue",
     "body": [

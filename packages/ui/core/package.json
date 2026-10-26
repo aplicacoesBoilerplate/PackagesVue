@@ -17,7 +17,12 @@
     },
     "./style.css": "./dist/style.css",
     "./manifest": "./dist/docs.manifest.json",
-    "./snippets": "./dist/snippets.json"
+    "./snippets": "./dist/snippets.json",
+    "./preview-loaders": {
+      "types": "./dist/preview-loaders.d.ts",
+      "import": "./dist/preview-loaders.js",
+      "require": "./dist/preview-loaders.cjs"
+    }
   },
   "sideEffects": [
     "**/*.css"
@@ -30,6 +35,7 @@
     "vue": "^3.5.0"
   },
   "scripts": {
+    "prebuild": "npm run generate:entry --workspace @aplicacoesboilerplate/docs-manifest -- ../../../packages/ui/core",
     "build": "vite build",
     "postbuild": "npm run generate --workspace @aplicacoesboilerplate/docs-manifest -- ../../../packages/ui/core",
     "prepack": "npm run build",

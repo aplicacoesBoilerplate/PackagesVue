@@ -30,3 +30,4 @@ coverage
 .turbo/
 entrega.md
 .envrc
+packages/ui/*/src/docs/*.generated.ts
