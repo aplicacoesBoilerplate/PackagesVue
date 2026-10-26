@@ -12,6 +12,8 @@ Biblioteca UI para aplicações que adotam PrimeVue. Mantém versão independent
 
 ## API atual
 
+<BaseOverlayPreview package="ui-prime-vue" />
+
 O ponto de entrada exporta BaseOverlay. Consulte a referência gerada para o contrato da implementação desta biblioteca; não presuma identidade com os componentes dos outros packages.
 
 [Referência de BaseOverlay](../generated/ui-prime-vue/base-overlay)

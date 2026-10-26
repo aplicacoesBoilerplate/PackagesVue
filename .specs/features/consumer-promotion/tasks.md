@@ -41,8 +41,8 @@ T1 -> T2 -> T3
 **Requirement**: CPRO-01, CPRO-02
 **Tests**: npm10.9.4 run verify; npm pack --ignore-scripts após build; consumidor real e browser; VitePress; todos os casos de spec.md.
 **Gate**: Full.
-- [ ] Executar fluxo real e corrigir somente lacunas necessárias ao piloto.
-- [ ] Registrar evidências, gate e commit/push.
+- [x] Cinco pacotes instalados e três overlays aprovados por fluxo automático, tipos/build e navegador; previews documentais corrigidos sem modificar bibliotecas.
+- [x] verify17/17 sem cache, fluxo consumidor e Cua aprovados; evidências/reprodução registradas para commit/push, revisão e CI em T3.
 
 ### T3: Revisar e entregar promoção
 **Where**: validation.md, relatório e PR para develop.

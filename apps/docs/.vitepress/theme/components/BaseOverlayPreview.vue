@@ -21,7 +21,8 @@
       Exibir overlay
     </button>
 
-    <BaseOverlay
+    <component
+      :is="rOverlay"
       :modelValue="rShowOverlay"
       :message="rMessage"
     />
@@ -29,9 +30,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
-import { BaseOverlay } from '@aplicacoesboilerplate/ui-core';
+import { BaseOverlay as CoreOverlay } from '@aplicacoesboilerplate/ui-core';
+import { BaseOverlay as PrimeOverlay } from '@aplicacoesboilerplate/ui-prime-vue';
+import { BaseOverlay as VuetifyOverlay } from '@aplicacoesboilerplate/ui-vuetify';
+
+const lProps = withDefaults(
+  defineProps<{
+    package?: 'ui-core' | 'ui-prime-vue' | 'ui-vuetify';
+  }>(),
+  { package: 'ui-core' },
+);
+const lOverlays = {
+  'ui-core': CoreOverlay,
+  'ui-prime-vue': PrimeOverlay,
+  'ui-vuetify': VuetifyOverlay,
+};
+const rOverlay = computed(() => lOverlays[lProps.package]);
 
 const rMessage = ref('Carregando componente...');
 const rShowOverlay = ref(false);

@@ -32,7 +32,7 @@ A release candidata já contém a infraestrutura centralizada e documentação, 
 **User Story:** Como mantenedor, quero verificar o pacote instalado em uma aplicação antes de promover a release.
 **Acceptance Criteria:**
 1. WHEN cinco tarballs candidatos forem instalados em consumidor isolado THEN imports ESM/CJS e tipos SHALL resolver os nomes públicos/versões/exports reais, sem aliases para os fontes do workspace.
-2. WHEN cada overlay dos três pacotes UI for aberto e fechado THEN o consumidor SHALL renderizar o conteúdo e sincronizar modelValue e close conforme sua API documentada.
+2. WHEN o consumidor alternar modelValue de false para true e depois false THEN cada overlay UI SHALL exibir a mensagem própria, renderizar via Teleport no body com position fixed e voltar a ficar oculto. O fechamento é controlado pelo consumidor; não se presume evento close inexistente.
 3. WHEN as páginas dos três pacotes UI forem homologadas THEN elas SHALL oferecer demonstração executável do respectivo pacote, sem importar o nome público antigo.
 4. The ensaio SHALL preservar composables/utils com entradas ainda vazias e não afirmar integração específica com frameworks que o componente não implementa.
 **Independent Test:** npm10.9.4 run verify; npm pack --ignore-scripts após build; consumidor real e browser; VitePress.
@@ -53,7 +53,7 @@ A release candidata já contém a infraestrutura centralizada e documentação, 
 ## Requirement Traceability
 | Requirement ID | Story | Status |
 | --- | --- | --- |
-| CPRO-01 | Consumo real | Pendente |
+| CPRO-01 | Consumo real | Cinco tarballs/exports/tipos e três overlays aprovados; previews reais conferidos no navegador |
 | CPRO-02 | Promoção verificável | Em preparação |
 
 ## Success Criteria

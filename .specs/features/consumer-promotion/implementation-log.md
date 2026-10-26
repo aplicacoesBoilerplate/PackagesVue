@@ -1,0 +1,11 @@
+# Homologação Vue
+
+- T1 publicada em7ed4ff036b6d4f192b997a64a1dcf3d6db533118. Candidata da release9feefcf, develop já ancestral, originais sujos/features futuras preservados.
+- O recon encontrou preview core dentro de fence e importação antiga no guia. As páginas manuais PrimeVue/Vuetify não tinham demonstração executável. Parametrizado o preview existente para três imports reais e incluído nas três páginas manuais, sem modificar os componentes das bibliotecas ou arquivos generated/.
+- Um único fluxo TS em tests/consumer/smoke.ts empacota os cinco pacotes públicos e os instala em scratch externo, sem lifecycle de pack/install. Versões de peers/ferramentas vêm do lockfile; nenhuma dependência nova foi adicionada ao monorepo.
+- Primeiro ensaio em Temp/packages-vue-consumer-ASMNy2/consumer: cinco pacotes, nomes/versões/realpaths e hash ESM/CJS/tipos conferidos; manifests/snippets/CSS corretos; composables/utils sem APIs de runtime. Os três overlays passaram os estados false/true/false com Vue real e happy-dom. Typecheck e build Vite externos aprovados.
+- Gate completo npm10.9.4 verify -- --force --concurrency=1:17/17 tarefas, zero cache,1m41s, incluindo VitePress e os quatro testes existentes. Lint dos dois arquivos TS/Vue e formatação conferidos; sem adicionar tarefas de lint inexistentes aos pacotes.
+- Navegador IAB/Cua: consumidor Vite127.0.0.1:5179 instalado por tarballs, três overlays abertos e fechados. Cada mensagem/aria-label corresponde ao pacote; position fixed e Teleportbody confirmados; zero erros de console. Evidência visual em Codex visualizations/consumer-homologation/vue-tarball-consumer.jpg.
+- Site local compilado em127.0.0.1:5180/PackagesVue/: previews core/PrimeVue/Vuetify executados com mensagem própria, CSSfixed/Teleport e fechamento temporizado; zero erros de console. Versões0.0.1/0.0.1/1.1.1 exibidas por pacote; screenshot vue-documentation-preview.jpg no mesmo diretório de evidências.
+- O fechamento é controle de modelValue pelo consumidor. Não foi inventado evento close nem alegada integração com componentes visuais específicos dos frameworks. APIs vazias dos dois packages permanecem honestas.
+- T3 ainda exige repin dos callers para o central publicado, revisão independente/sensor e CI/PR para develop. Não houve merge remoto, npm publish ou implantação Pages.

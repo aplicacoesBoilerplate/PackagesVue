@@ -4,6 +4,6 @@ Documentação dos cinco pacotes públicos do monorepo e das APIs UI extraídas 
 
 <PackageCatalog />
 
-As páginas de cada pacote descrevem instalação, requisitos e o estado real da API. O catálogo gerado preserva os exemplos e previews das três bibliotecas UI.
+As páginas de cada pacote descrevem instalação, requisitos e o estado real da API, com um preview executável do overlay de cada biblioteca UI. O catálogo gerado preserva os exemplos presentes nos fontes.
 
 [Começar pelos pacotes](./packages/) · [Instalação](./instalacao) · [Catálogo de APIs UI](./generated/) · [Versões e publicação](./versionamento)

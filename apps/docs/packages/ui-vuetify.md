@@ -12,6 +12,8 @@ Biblioteca UI para aplicações que adotam Vuetify. Mantém versão independente
 
 ## API atual
 
+<BaseOverlayPreview package="ui-vuetify" />
+
 O ponto de entrada exporta BaseOverlay. O contrato da implementação é documentado a partir do manifesto público do próprio package.
 
 [Referência de BaseOverlay](../generated/ui-vuetify/base-overlay)

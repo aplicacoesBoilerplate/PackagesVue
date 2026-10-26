@@ -12,6 +12,8 @@ Componentes construídos com Vue nativo, com Vue como peer dependency. O pacote 
 
 ## API atual
 
+<BaseOverlayPreview package="ui-core" />
+
 O ponto de entrada exporta BaseOverlay e o tipo IBaseOverlayProps. O catálogo gerado preserva as propriedades, eventos, snippets e exemplos extraídos dos fontes.
 
 [Referência e preview de BaseOverlay](../generated/ui-core/base-overlay) · [IBaseOverlayProps](../generated/ui-core/i-base-overlay-props)

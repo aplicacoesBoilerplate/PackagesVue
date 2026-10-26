@@ -17,6 +17,7 @@
     "lint": "turbo run lint",
     "type-check": "turbo run type-check",
     "verify": "turbo run lint type-check test build",
+    "test:consumer": "tsc --noEmit --target ES2022 --module NodeNext --moduleResolution NodeNext --types node --skipLibCheck tests/consumer/smoke.ts && node --experimental-strip-types tests/consumer/smoke.ts",
     "dev:docs": "npm run dev --workspace @aplicacoesboilerplate/docs",
     "generate:docs-catalog": "npm run generate --workspace @aplicacoesboilerplate/docs-catalog",
     "format": "prettier . --write",
