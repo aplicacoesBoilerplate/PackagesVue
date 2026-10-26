@@ -13,4 +13,3 @@ Aplicar TLC ao piloto consumidor; manter implementação inline, artefatos reais
 - **In-progress:** persistir fluxo TS e previews; verify17/17 sem cache, consumidor5pacotes e navegador3overlays aprovados.
 - **Next step:** T3 repinar callers para release central publicada v0.1.0, revisão independente/sensor e PR candidato para develop. Master/deploy aguardam integração humana.
 - **Blockers:** nenhum para executar testes; integração remota e master permanecem humanos.
-

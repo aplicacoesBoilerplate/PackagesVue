@@ -60,4 +60,3 @@ A release candidata já contém a infraestrutura centralizada e documentação, 
 - [ ] Artefatos instalados e cenários funcionais aprovados.
 - [ ] Gates preservados, evidências e sensor independentes aprovados.
 - [ ] Candidata publicada e PR para develop entregue; master/deploy explicitamente pendentes da integração humana.
-

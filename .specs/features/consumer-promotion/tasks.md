@@ -52,4 +52,3 @@ T1 -> T2 -> T3
 **Gate**: Build.
 - [ ] Revisão independente e CI aprovadas; limitações humanas explícitas.
 - [ ] Checkpoint final publicado e PR entregue, sem alegar merge/deploy não executados.
-
