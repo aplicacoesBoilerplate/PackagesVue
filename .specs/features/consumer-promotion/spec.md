@@ -40,7 +40,7 @@ A release candidata já contém a infraestrutura centralizada e documentação, 
 ### P1: Promoção verificável
 **User Story:** Como mantenedor, quero revisar uma candidata fiel à release e ao destino.
 **Acceptance Criteria:**
-1. WHEN a candidata for preparada THEN ela SHALL preservar as features da release e o contrato central fixado em080df5a, publish-artifacts=false e todos os testes existentes.
+1. WHEN a candidata for preparada THEN ela SHALL preservar as features da release e o contrato central fixado em4176883, publish-artifacts=false e todos os testes existentes.
 2. WHEN os gates terminarem THEN relatório e código SHALL ser commitados/publicados antes de abrir o PR para develop, identificando SHA, resultados e limitações.
 3. WHEN a entrega for apresentada THEN ela SHALL conter revisão independente e CI da candidata; IF a integração depender de revisão humana THEN ela SHALL registrar esse estado sem declarar master ou Pages publicados.
 **Independent Test:** Comparação Git, gate completo, sensor isolado e revisão independente.

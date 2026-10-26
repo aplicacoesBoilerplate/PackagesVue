@@ -14,11 +14,11 @@ jobs:
     permissions:
       contents: read
       pull-requests: read
-    uses: aplicacoesBoilerplate/.github/.github/workflows/version-release-please-validate.yml@080df5aa1c803252ba91fa00ac529fc5e2006c47
+    uses: aplicacoesBoilerplate/.github/.github/workflows/version-release-please-validate.yml@4176883e69cf32fe36d1b893e246bbdc03885cf9
     with:
       config-file: release-please-config.json
       project-path: .
-      central-ref: 080df5aa1c803252ba91fa00ac529fc5e2006c47
+      central-ref: 4176883e69cf32fe36d1b893e246bbdc03885cf9
 
   validate:
     if: github.event.pull_request.merged == true
@@ -31,10 +31,10 @@ jobs:
       contents: write
       pull-requests: write
       issues: write
-    uses: aplicacoesBoilerplate/.github/.github/workflows/version-release-please-called.yml@080df5aa1c803252ba91fa00ac529fc5e2006c47
+    uses: aplicacoesBoilerplate/.github/.github/workflows/version-release-please-called.yml@4176883e69cf32fe36d1b893e246bbdc03885cf9
     with:
       project-type: node
-      central-ref: 080df5aa1c803252ba91fa00ac529fc5e2006c47
+      central-ref: 4176883e69cf32fe36d1b893e246bbdc03885cf9
       publish-artifacts: false
       project-path: .
       config-file: release-please-config.json

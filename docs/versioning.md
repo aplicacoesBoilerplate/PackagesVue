@@ -1,6 +1,6 @@
 # Versionamento do workspace: etapa 1
 
-O caller pertence a esta aplicação: .github/workflows/release.yml. Ele aguarda a CI do commit integrado em master e chama o central/scripts na mesma revisão 080df5aa1c803252ba91fa00ac529fc5e2006c47. Apenas o job de release recebe escrita; sem secrets de registry herdados.
+O caller pertence a esta aplicação: .github/workflows/release.yml. Ele aguarda a CI do commit integrado em master e chama o central/scripts na mesma revisão 4176883e69cf32fe36d1b893e246bbdc03885cf9. Apenas o job de release recebe escrita; sem secrets de registry herdados.
 
 As cinco bibliotecas mantêm versões independentes. O Release Please calcula cada incremento pelos Conventional Commits e gera um PR técnico conjunto com versões, changelogs e lockfile. O contrato atual usa config-file/manifest-file/project-path e valida versões declaradas por milestone ou Release-As contra as tags do componente. Uma declaração global só pode identificar um componente; em entregas multipacote, preserve o cálculo nativo ou declare release-as por pacote no config. Depois da revisão, CI e merge do PR técnico, o motor publica tags/GitHub Releases dos componentes alterados, sem exigir outra milestone.
 
@@ -24,7 +24,7 @@ A suíte central usa o motor/plugin reais para incremento independente, dependen
 
 Integração em codex/release-please-stage1 para release/v0.0.1; não promove features a master. O ciclo hospedado de PR/tag/Release segue pendente dos merges humanos pelo Git Flow da aplicação. Uma entrega fix:/feat: depois da base bootstrap deve exercitar esse ciclo; conferir os pacotes afetados e nenhuma distribuição antes de integrar o PR técnico.
 
-[Contrato central](https://github.com/aplicacoesBoilerplate/.github/blob/080df5aa1c803252ba91fa00ac529fc5e2006c47/docs/pipelines/versionamento-release-please.md).
+[Contrato central](https://github.com/aplicacoesBoilerplate/.github/blob/4176883e69cf32fe36d1b893e246bbdc03885cf9/docs/pipelines/versionamento-release-please.md).
 
 ## Iteração documental T3
 
@@ -33,5 +33,11 @@ O site tem páginas dos cinco pacotes com versão/instalação do mesmo checkout
 Gate local aprovado: npm10.9.4 verify -- --force --concurrency=1, 17/17 tarefas sem cache, incluindo o VitePress real. O buildEnd exige versões e comandos de instalação nas cinco páginas e manifesta/export/API não vazia nas três bibliotecas UI. O caller documental usa o central fixado, install-dir raiz, build-script build e base /PackagesVue/. Pages foi habilitado pelo administrador; a publicação ainda aguarda promoção humana para master.
 
 O primeiro gate não detectou que o Turbo em modo strict descartava DOCS_BASE e DOCS_SOURCE_SHA: a revisão independente encontrou assets em /assets/ no HTML recém-gerado. O build documental agora declara essas variáveis em env, incluindo seus valores no hash do cache. Os inputs também incluem release-please-config.json e os manifests dos cinco pacotes, inclusive composables/utils, que não são dependências diretas do app documental. Assim, mudar base, commit ou versão de pacote invalida a documentação sem propagar essas variáveis para os builds das bibliotecas. O buildEnd confere ainda os caminhos dos assets e o commit recebido.
+
+## Homologação do consumidor
+
+A CI acrescenta npm run test:consumer depois do verify. Um único fluxo TypeScript instala tarballs fora do monorepo, confere ESM/CJS/tipos e exercita os três overlays. A aplicação Vite gerada permite homologação no navegador; as páginas manuais também oferecem previews de cada biblioteca. [Reprodução](https://github.com/aplicacoesBoilerplate/PackagesVue/blob/master/tests/consumer/README.md).
+
+Os callers usam o commit publicado da release central v0.1.0. O antigo SHA de desenvolvimento deixou de ser encontrado pelo Actions após a integração; os três workflows, guard/validator/manifest e lockfile do runtime foram comparados e permanecem idênticos.
 
 Reparo verificado: 17/17 tarefas sem cache em 4m35s e nova execução em CI=true com 17/17, recompilando a documentação. Os cinco HTML finais têm /PackagesVue/assets/ e o SHA fornecido. VitePress rejeita em CI a ausência de base ou SHA, e o passo verify fornece ambos; desenvolvimento local preserva os defaults. ESLint e Prettier do config foram conferidos. A revalidação independente e os checks hospedados registram a entrega final no planejamento central.

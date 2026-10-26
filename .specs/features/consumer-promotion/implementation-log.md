@@ -9,3 +9,8 @@
 - Site local compilado em127.0.0.1:5180/PackagesVue/: previews core/PrimeVue/Vuetify executados com mensagem própria, CSSfixed/Teleport e fechamento temporizado; zero erros de console. Versões0.0.1/0.0.1/1.1.1 exibidas por pacote; screenshot vue-documentation-preview.jpg no mesmo diretório de evidências.
 - O fechamento é controle de modelValue pelo consumidor. Não foi inventado evento close nem alegada integração com componentes visuais específicos dos frameworks. APIs vazias dos dois packages permanecem honestas.
 - T3 ainda exige repin dos callers para o central publicado, revisão independente/sensor e CI/PR para develop. Não houve merge remoto, npm publish ou implantação Pages.
+
+## T3 em andamento
+
+- Callers repinados para4176883e69cf32fe36d1b893e246bbdc03885cf9, release central publicada v0.1.0. A falha hospedada Java comprovou que Actions não encontrava080df5a, cuja branch antiga foi removida. Comparação dos três workflows, manifest/validator/guard e lockfile confirmou identidade dos arquivos de runtime, sem alterar o central.
+- O consumidor Vue usa a mesma referência em uses/central-ref; documentação e distribuição false preservadas. Revisão independente e CI da candidata ainda pendentes.
