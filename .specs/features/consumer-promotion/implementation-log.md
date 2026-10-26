@@ -14,3 +14,10 @@
 
 - Callers repinados para4176883e69cf32fe36d1b893e246bbdc03885cf9, release central publicada v0.1.0. A falha hospedada Java comprovou que Actions não encontrava080df5a, cuja branch antiga foi removida. Comparação dos três workflows, manifest/validator/guard e lockfile confirmou identidade dos arquivos de runtime, sem alterar o central.
 - O consumidor Vue usa a mesma referência em uses/central-ref; documentação e distribuição false preservadas. Revisão independente e CI da candidata ainda pendentes.
+
+## Checkpoint final
+
+- Produto verificado em279e85025e86cd883127bfb5a5dcb782f8945a8a; PR40 para develop. verify17/17, cinco tarballs/ESM/CJS/tipos e três overlays/previews aprovados;2/2sensores detectados. Cua do autor separado dos gates independentes.
+- CI40264769278 e documentação40264769605 aprovadas no mesmo SHA; deploy corretamente ignorado em PR. Relatório independente7/7ACs, validate_state e diff completo aprovados. Este checkpoint altera apenas metadados.
+- Candidata inclui a baseline da release, sem coletar features futuras. Preferir merge commit na promoção para preservar a ancestralidade da release/bootstrap; depois revisar develop para master e comprovar Pages em execução real.
+- Checkpoint publicado antes da revisão humana. Não houve merge remoto, publicação de pacotes ou alteração do central .github/Go.

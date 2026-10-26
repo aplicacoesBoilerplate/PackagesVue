@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "promote_threshold": 2,
+  "window_days": 45,
+  "quarantine_threshold": 2,
+  "next_id": 2,
+  "lessons": [
+    {
+      "id": "L-001",
+      "key": "gate_fail::conferir git diff check contra a baseline da release antes da promocao mesmo quando o checkout esta limpo",
+      "text": "Conferir git diff --check contra a baseline da release antes da promoção, mesmo quando o checkout está limpo.",
+      "signal": "gate_fail",
+      "scope": ".specs/promocao",
+      "status": "candidate",
+      "features": [
+        "consumer-promotion"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/consumer-promotion/validation.md:49 (.specs/promocao)"
+      ],
+      "created": "2026-10-26T03:36:25Z",
+      "last_seen": "2026-10-26T03:36:25Z"
+    }
+  ]
+}
