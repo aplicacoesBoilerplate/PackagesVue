@@ -1,111 +1,41 @@
-name: Release
+name: Release Please
 
 on:
-  push:
+  pull_request:
+    types: [opened, reopened, synchronize, edited, milestoned, demilestoned, closed]
     branches: [master]
-  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  select-mode:
-    runs-on: ubuntu-latest
-    outputs:
-      mode: ${{ steps.select.outputs.mode }}
-      publish-plan-artifact-id: ${{ steps.select.outputs.publish-plan-artifact-id }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+  version-policy:
+    if: github.event.action != 'closed'
+    permissions:
+      contents: read
+      pull-requests: read
+    uses: aplicacoesBoilerplate/.github/.github/workflows/version-release-please-validate.yml@080df5aa1c803252ba91fa00ac529fc5e2006c47
+    with:
+      config-file: release-please-config.json
+      project-path: .
+      central-ref: 080df5aa1c803252ba91fa00ac529fc5e2006c47
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: 22
-          cache: npm
-          registry-url: https://npm.pkg.github.com
-          scope: '@aplicacoesboilerplate'
+  validate:
+    if: github.event.pull_request.merged == true
+    uses: ./.github/workflows/ci.yml
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Select release mode
-        id: select
-        uses: changesets/action/select-mode@v2
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  version:
-    needs: select-mode
-    if: needs.select-mode.outputs.mode == 'version'
-    runs-on: ubuntu-latest
+  release:
+    if: github.event.pull_request.merged == true
+    needs: validate
     permissions:
       contents: write
       pull-requests: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Check release token
-        env:
-          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        run: |
-          if [ -z "$RELEASE_TOKEN" ]; then
-            echo "Configure o secret RELEASE_TOKEN para permitir a criação da pull request de release."
-            exit 1
-          fi
-
-      - name: Create release pull request
-        uses: changesets/action/version@v2
-        with:
-          github-token: ${{ secrets.RELEASE_TOKEN }}
-          pr-title: 'chore(release): version packages'
-          commit-message: 'chore(release): version packages'
-
-  publish:
-    needs: select-mode
-    if: needs.select-mode.outputs.mode == 'publish'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      packages: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: 22
-          cache: npm
-          registry-url: https://npm.pkg.github.com
-          scope: '@aplicacoesboilerplate'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Verify monorepo
-        run: npm run verify
-
-      - name: Pack packages
-        id: pack
-        uses: changesets/action/pack@v2
-        with:
-          publish-plan-artifact-id: ${{ needs.select-mode.outputs.publish-plan-artifact-id }}
-
-      - name: Publish packages
-        uses: changesets/action/publish@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          pack-dir-artifact-id: ${{ steps.pack.outputs.pack-dir-artifact-id }}
-          create-github-releases: true
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      issues: write
+    uses: aplicacoesBoilerplate/.github/.github/workflows/version-release-please-called.yml@080df5aa1c803252ba91fa00ac529fc5e2006c47
+    with:
+      project-type: node
+      central-ref: 080df5aa1c803252ba91fa00ac529fc5e2006c47
+      publish-artifacts: false
+      project-path: .
+      config-file: release-please-config.json
+      manifest-file: .release-please-manifest.json

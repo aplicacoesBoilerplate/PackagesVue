@@ -1,41 +1,20 @@
-name: Build documentation
-
+name: Documentação
 on:
+  pull_request:
+    paths: ['apps/docs/**', 'packages/**', 'tools/docs/**', 'package.json', 'package-lock.json', 'turbo.json', 'release-please-config.json', '.github/workflows/docs-deploy.yml']
   push:
     branches: [master]
-    paths:
-      - '.github/workflows/docs-deploy.yml'
-      - 'apps/docs/**'
-      - 'packages/ui/**'
-      - 'package.json'
-      - 'package-lock.json'
+    paths: ['apps/docs/**', 'packages/**', 'tools/docs/**', 'package.json', 'package-lock.json', 'turbo.json', 'release-please-config.json', '.github/workflows/docs-deploy.yml']
   workflow_dispatch:
-
 permissions:
   contents: read
-
+  pages: write
+  id-token: write
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build documentation
-        run: npm run build --workspace @aplicacoesboilerplate/docs
-
-      - name: Upload documentation artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: documentation
-          path: apps/docs/.vitepress/dist
-          retention-days: 14
+  documentation:
+    uses: aplicacoesBoilerplate/.github/.github/workflows/documentacao-pages.yml@080df5aa1c803252ba91fa00ac529fc5e2006c47
+    with:
+      docs-dir: apps/docs
+      install-dir: .
+      build-script: build
+      npm-version: '10.9.4'
