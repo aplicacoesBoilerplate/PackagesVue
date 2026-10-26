@@ -1,0 +1,55 @@
+# Homologação Vue: plano de execução
+
+**Goal:** provar o consumo empacotado da release atual e preparar promoção para develop.
+**Architecture:** consumidor isolado com artefatos reais; preservar fontes funcionais, contrato central e distribuição desligada.
+**Spec:** spec.md. Execução inline já escolhida; helpers somente recon e revisão.
+
+## Global Constraints
+Sem writes no central .github ou Go; sem registry/deploy; sem coletar PRs futuros; sem merges remotos por conta própria.
+
+## Test Coverage Matrix
+| Layer | Required Test Type | Coverage | Location | Command |
+| --- | --- | --- | --- | --- |
+| Consumidor | Fluxo funcional real | CPRO-01 completo | um fluxo de consumidor empacotado; previews/guia documental; configuração mínima de gate; documentos de homologação | npm10.9.4 run verify; npm pack --ignore-scripts após build; consumidor real e browser; VitePress |
+| Promoção | Gate/revisão | CPRO-02 | .specs/ e PR | Gate completo e APIs/Git |
+
+## Gate Check Commands
+| Gate | Command |
+| --- | --- |
+| Quick | Validadores TLC e git diff --check para documentação |
+| Full | npm10.9.4 run verify; npm pack --ignore-scripts após build; consumidor real e browser; VitePress |
+| Build | Full + revisão independente/CI |
+
+## Execution Plan
+```text
+T1 -> T2 -> T3
+```
+
+## Task Breakdown
+### T1: Preparar candidata e contrato
+**Where**: .specs/ e histórico candidato.
+**Depends on**: None
+**Requirement**: CPRO-02
+**Tests**: Comparar trees de merge e validar spec/tasks; nenhuma mudança de runtime.
+**Gate**: Quick.
+- [x] Branch isolada da release, develop reconciliada sem conflitos; contrato específico e plano registrados.
+- [x] T1 pronta para commit/push: merge tree idêntica à release, validadores sem erros e plano linear conferido; persistir antes de T2.
+
+### T2: Homologar consumidor empacotado
+**Where**: um fluxo de consumidor empacotado; previews/guia documental; configuração mínima de gate; documentos de homologação.
+**Depends on**: T1
+**Requirement**: CPRO-01, CPRO-02
+**Tests**: npm10.9.4 run verify; npm pack --ignore-scripts após build; consumidor real e browser; VitePress; todos os casos de spec.md.
+**Gate**: Full.
+- [ ] Executar fluxo real e corrigir somente lacunas necessárias ao piloto.
+- [ ] Registrar evidências, gate e commit/push.
+
+### T3: Revisar e entregar promoção
+**Where**: validation.md, relatório e PR para develop.
+**Depends on**: T2
+**Requirement**: CPRO-02
+**Tests**: Verifier distinto, sensor em scratch, CI e SHA remoto.
+**Gate**: Build.
+- [ ] Revisão independente e CI aprovadas; limitações humanas explícitas.
+- [ ] Checkpoint final publicado e PR entregue, sem alegar merge/deploy não executados.
+
