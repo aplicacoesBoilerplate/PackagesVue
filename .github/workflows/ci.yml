@@ -1,10 +1,11 @@
 name: CI
 
 on:
+  workflow_call:
   pull_request:
-    branches: [master]
+    branches: [master, develop, 'release/**']
   push:
-    branches: [master]
+    branches: [master, develop, 'release/**']
 
 permissions:
   contents: read
@@ -22,7 +23,11 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: 22
-          cache: npm
+          package-manager-cache: false
+
+      - name: Pin npm required by devEngines
+        working-directory: ${{ runner.temp }}
+        run: npm install --global npm@10.9.4 --ignore-scripts
 
       - name: Install dependencies
         run: npm ci
@@ -35,18 +40,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-
 
-      - name: Require changeset for package changes
-        if: github.event_name == 'pull_request' && github.actor != 'github-actions[bot]'
-        env:
-          BASE_REF: ${{ github.base_ref }}
-        run: |
-          changed_files="$(git diff --name-only "origin/${BASE_REF}"...HEAD)"
-          package_changed="$(printf '%s\n' "$changed_files" | grep -E '^packages/[^/]+/' || true)"
-          changeset_added="$(printf '%s\n' "$changed_files" | grep -E '^\.changeset/.+\.md$' || true)"
-          if [ -n "$package_changed" ] && [ -z "$changeset_added" ]; then
-            echo "Alterações em pacotes publicáveis exigem um changeset. Execute: npm run changeset"
-            exit 1
-          fi
-
       - name: Verify monorepo
+        env:
+          DOCS_BASE: /${{ github.event.repository.name }}/
+          DOCS_SOURCE_SHA: ${{ github.sha }}
         run: npm run verify
+      - name: Homologar consumidor com tarballs reais
+        run: npm run test:consumer

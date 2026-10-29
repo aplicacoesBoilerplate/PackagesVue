@@ -8,19 +8,22 @@ Vuetify e utiliza `Teleport` para renderizar acima da aplicação consumidora.
 ## Importação
 
 ```ts
-import { BaseOverlay } from '@aplicacoesboilerplate/ui';
+import { BaseOverlay } from '@aplicacoesboilerplate/ui-core';
 ```
 
 ## Uso
 
 ```vue
 <template>
-  <BaseOverlay :model-value="isLoading" message="Salvando dados..." />
+  <BaseOverlay
+    :model-value="isLoading"
+    message="Salvando dados..."
+  />
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { BaseOverlay } from '@aplicacoesboilerplate/ui';
+import { BaseOverlay } from '@aplicacoesboilerplate/ui-core';
 
 const isLoading = ref(false);
 </script>

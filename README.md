@@ -6,17 +6,19 @@ Monorepo npm de bibliotecas reutilizáveis da organização Aplicacoes Boilerpla
 
 | Pacote                               | Responsabilidade                             |
 | ------------------------------------ | -------------------------------------------- |
-| `@aplicacoesboilerplate/ui`          | Componentes Vue reutilizáveis.               |
+| `@aplicacoesboilerplate/ui-core`     | Componentes construídos com Vue nativo.       |
+| `@aplicacoesboilerplate/ui-prime-vue` | Componentes para aplicações PrimeVue.         |
+| `@aplicacoesboilerplate/ui-vuetify`   | Componentes para aplicações Vuetify.          |
 | `@aplicacoesboilerplate/composables` | Composables Vue independentes de aplicações. |
 | `@aplicacoesboilerplate/utils`       | Funções e classes puras compartilháveis.     |
 
-O pacote `ui` disponibiliza o `BaseOverlay`, um overlay de tela inteira independente de Vuetify.
+As três bibliotecas UI disponibilizam suas próprias implementações de `BaseOverlay` e mantêm versões independentes.
 Cada pacote possui entrada pública, build ESM/CJS, declarações TypeScript e configuração de publicação.
 
 ## Desenvolvimento
 
 ```bash
-npm install
+npm ci
 npm run verify
 ```
 
@@ -28,7 +30,6 @@ npm run lint
 npm run type-check
 npm run test
 npm run pack:check
-npm run changeset
 npm run dev:docs
 ```
 
@@ -37,51 +38,29 @@ bibliotecas.
 
 ## Catálogo de componentes
 
-`apps/docs` é o catálogo VitePress interno. Ele importa os componentes pelo nome público
-`@aplicacoesboilerplate/ui`, portanto cada preview usa a mesma implementação distribuída aos
-projetos consumidores.
+`apps/docs` contém páginas para os cinco pacotes e o catálogo de APIs das três bibliotecas UI.
+As versões são lidas dos `package.json` do mesmo checkout. Os previews usam os fontes desse commit;
+essa documentação não comprova que a distribuição no registry já foi executada.
 
 ```bash
 npm run dev:docs
 ```
 
-Abra a URL exibida pelo VitePress e navegue para **Componentes > BaseOverlay**. A página apresenta
-preview interativo, contrato de props, acessibilidade e exemplos de importação e uso.
+Antes do primeiro uso, execute `npm run build` na raiz para gerar os manifests das bibliotecas.
+Abra a URL exibida pelo VitePress e navegue pelos pacotes ou pelo catálogo de APIs UI.
 
 O catálogo é uma aplicação privada separada e não é incluído no bundle das aplicações consumidoras.
-O build estático é validado pela CI. A workflow **Build documentation** guarda o resultado como
-artefato por 14 dias para inspeção e para um futuro deploy em infraestrutura interna.
-
-Quando a hospedagem interna for definida, a mesma workflow poderá receber a etapa de deploy que usa
-o diretório `apps/docs/.vitepress/dist`. Os desenvolvedores consumidores não precisam instalar
-pacotes adicionais para consultar o catálogo publicado.
+O caller `.github/workflows/docs-deploy.yml` usa a pipeline documental central: instala o workspace
+com npm10.9.4, constrói os manifests e o site e publica GitHub Pages após promoção para master.
+PRs executam somente o build. O destino configurado é [PackagesVue](https://aplicacoesboilerplate.github.io/PackagesVue/).
 
 ## Versionamento e publicação
 
-O monorepo usa Changesets para versões independentes por pacote. Para toda alteração publicável:
+O monorepo usa o Release Please centralizado, com versões independentes e um caller mantido nesta aplicação. [Configuração, versões iniciais e roteiro da etapa 1](docs/versioning.md).
 
-```bash
-npm run changeset
-```
+O contrato atual calcula versões por componente e valida declarações milestone/Release-As contra suas tags. Para vários componentes alterados, mantenha o cálculo nativo ou declare versões por pacote; um override global ambíguo é bloqueado. Após o merge humano, a pipeline prepara o PR técnico. O merge desse segundo PR cria tags e GitHub Releases automaticamente. A etapa 1 não publica em registry; distribuição será tratada separadamente.
 
-Selecione os pacotes afetados e o incremento semântico adequado. Inclua o arquivo criado em
-`.changeset/` no commit. Pull requests que alteram `packages/*` sem changeset são recusadas pela CI.
-
-O changeset incluído para `BaseOverlay` é `minor`: partindo de `@aplicacoesboilerplate/ui@1.0.0`, a
-pull request de release preparará a versão `1.1.0` para publicação.
-
-mesclagem dessa pull request atualiza versões e changelogs e publica os artefatos no GitHub Packages.
-Após a mesclagem em `master`, a workflow `Release` cria ou atualiza uma pull request de versão. A
-mesclagem dessa pull request atualiza versões e changelogs e publica os artefatos no GitHub Packages.
-mesclagem dessa pull request atualiza versões e changelogs e publica os artefatos no GitHub Packages.
-
-Os hooks do Husky executam Commitlint no commit, lint-staged antes do commit e `npm run verify`
-antes do push. Eles não incrementam versões: a escolha explícita no Changeset evita versões erradas
-quando uma mudança afeta mais de um pacote.
-
-Para permitir a criação da pull request de versão, configure o secret `RELEASE_TOKEN` com um token
-fine-grained que tenha acesso ao repositório e permissões **Contents: Read and write** e
-**Pull requests: Read and write**. Um PAT classic com o escopo `repo` também é aceito.
+Conventional Commits continuam exigidos pelos hooks. Changesets deixou de ser um gate de PR e de controlar versões/publicação automaticamente. Não é necessário um RELEASE_TOKEN adicional para este fluxo: usa GITHUB_TOKEN, respeitando a política de criação de PRs do repositório.
 
 ## Consumo privado
 
@@ -95,8 +74,7 @@ No projeto consumidor, configure o registro e um token com permissão `read:pack
 Depois, instale normalmente:
 
 ```bash
-npm install @aplicacoesboilerplate/ui
+npm install @aplicacoesboilerplate/ui-core
 ```
 
-O token nunca deve ser salvo no repositório. A CI de publicação usa `GITHUB_TOKEN` com permissão
-`packages: write`.
+O token nunca deve ser salvo no repositório. A publicação no registry pertence à etapa 2.

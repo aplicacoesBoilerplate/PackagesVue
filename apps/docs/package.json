@@ -4,11 +4,17 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prebuild": "npm run generate --workspace @aplicacoesboilerplate/docs-catalog",
     "build": "vitepress build .",
     "dev": "vitepress dev ."
   },
   "dependencies": {
-    "@aplicacoesboilerplate/ui": "^1.1.1",
+    "@aplicacoesboilerplate/ui-core": "^0.0.1",
+    "@aplicacoesboilerplate/ui-prime-vue": "^0.0.1",
+    "@aplicacoesboilerplate/ui-vuetify": "^1.1.1",
     "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@aplicacoesboilerplate/docs-catalog": "^0.0.1"
   }
 }
