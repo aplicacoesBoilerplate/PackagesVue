@@ -8,26 +8,54 @@
 
     <label>
       Mensagem
-      <input v-model="message" type="text" />
+      <input
+        v-model="rMessage"
+        type="text"
+      />
     </label>
 
-    <button type="button" @click="handleShowOverlay">Exibir overlay</button>
+    <button
+      type="button"
+      @click="handleShowOverlay"
+    >
+      Exibir overlay
+    </button>
 
-    <BaseOverlay :model-value="showOverlay" :message="message" />
+    <component
+      :is="rOverlay"
+      :modelValue="rShowOverlay"
+      :message="rMessage"
+    />
   </section>
 </template>
 
 <script setup lang="ts">
-import { BaseOverlay } from '@aplicacoesboilerplate/ui';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
-const message = ref('Carregando componente...');
-const showOverlay = ref(false);
+import { BaseOverlay as CoreOverlay } from '@aplicacoesboilerplate/ui-core';
+import { BaseOverlay as PrimeOverlay } from '@aplicacoesboilerplate/ui-prime-vue';
+import { BaseOverlay as VuetifyOverlay } from '@aplicacoesboilerplate/ui-vuetify';
+
+const lProps = withDefaults(
+  defineProps<{
+    package?: 'ui-core' | 'ui-prime-vue' | 'ui-vuetify';
+  }>(),
+  { package: 'ui-core' },
+);
+const lOverlays = {
+  'ui-core': CoreOverlay,
+  'ui-prime-vue': PrimeOverlay,
+  'ui-vuetify': VuetifyOverlay,
+};
+const rOverlay = computed(() => lOverlays[lProps.package]);
+
+const rMessage = ref('Carregando componente...');
+const rShowOverlay = ref(false);
 
 function handleShowOverlay(): void {
-  showOverlay.value = true;
+  rShowOverlay.value = true;
   window.setTimeout(() => {
-    showOverlay.value = false;
+    rShowOverlay.value = false;
   }, 1500);
 }
 </script>

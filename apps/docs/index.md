@@ -1,20 +1,9 @@
----
-layout: home
+# PackagesVue
 
-hero:
-  name: Aplicacoes Boilerplate UI
-  text: Componentes Vue para produtos consistentes
-  tagline: Catálogo vivo, documentação técnica e previews interativos do pacote publicado.
-  actions:
-    - theme: brand
-      text: Ver componentes
-      link: /componentes/base-overlay
+Documentação dos cinco pacotes públicos do monorepo e das APIs UI extraídas dos seus fontes.
 
-features:
-  - title: Fonte de verdade única
-    details: Os previews importam os componentes exportados por @aplicacoesboilerplate/ui.
-  - title: Contratos explícitos
-    details: Cada página descreve props, eventos, acessibilidade e exemplos de uso.
-  - title: Pronto para evoluir
-    details: Novos componentes adicionam uma página e um preview ao mesmo catálogo.
----
+<PackageCatalog />
+
+As páginas de cada pacote descrevem instalação, requisitos e o estado real da API, com um preview executável do overlay de cada biblioteca UI. O catálogo gerado preserva os exemplos presentes nos fontes.
+
+[Começar pelos pacotes](./packages/) · [Instalação](./instalacao) · [Catálogo de APIs UI](./generated/) · [Versões e publicação](./versionamento)
